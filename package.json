@@ -13,7 +13,8 @@
   "dependencies": {
     "cros": "^1.0.1",
     "express": "^4.17.3",
-    "express-validator": "^6.14.0"
+    "express-validator": "^6.14.0",
+    "mongoose": "^6.2.7"
   },
   "devDependencies": {
     "babel-eslint": "^10.1.0",
