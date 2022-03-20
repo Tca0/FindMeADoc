@@ -11,6 +11,9 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "cros": "^1.0.1",
+    "express": "^4.17.3",
+    "express-validator": "^6.14.0"
   },
   "devDependencies": {
     "babel-eslint": "^10.1.0",
