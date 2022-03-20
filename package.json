@@ -12,6 +12,7 @@
   "type": "module",
   "dependencies": {
     "bcrypt": "^5.0.1",
+    "command": "^0.0.5",
     "cors": "^2.8.5",
     "cros": "^1.0.1",
     "dotenv": "^16.0.0",
