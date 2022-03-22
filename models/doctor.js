@@ -10,10 +10,10 @@ const addressSchema = new mongoose.Schema({
 const phoneNumberSchema = new mongoose.Schema({
   contactNumber: { type: Number },
 });
-const specialtySchema = new mongoose.Schema({
-  //specialty can't be unique otherwise we can't add another doctor with same specialty
-  specialty: { type: String, lowercase: true, trim: true },
-});
+// const specialtySchema = new mongoose.Schema({
+//   //specialty can't be unique otherwise we can't add another doctor with same specialty
+//   specialty: { type: String, lowercase: true, trim: true },
+// });
 const languagesSchema = new mongoose.Schema({
   language: { type: String, lowercase: true, trim: true },
 });
@@ -29,13 +29,13 @@ const doctorSchema = new mongoose.Schema({
   secondName: { type: String, required: true, lowercase: true, trim: true },
   fullName: { type: String, unique: true, required: true, toLowerCase: true },
   email: { type: String, unique: true, lowercase: true, required: true },
-  specialties: [specialtySchema],
+  specialties: [{type:String}],
   DOB: { type: Date, default: Date.now },
   gender: { type: String, enum: ["male", "female", "other"], lowercase: true, trim: true },
   contactDetails: {phoneNumberSchema},
   address: {addressSchema},
   registerAt: { type: Date, default: Date.now },
-  languages: [languagesSchema],
+  languages: [{type:String}],
   reviews: {reviewSchema},
   // boolean value to decide if account is active or not
   //by default is un-active

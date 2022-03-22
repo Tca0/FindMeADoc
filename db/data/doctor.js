@@ -22,8 +22,6 @@ export default [
         active: false,
         experience: 1
         
-    },{
-        
     }
 
 ]
