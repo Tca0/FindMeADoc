@@ -21,7 +21,7 @@ const languagesSchema = new mongoose.Schema({
 const reviewSchema = new mongoose.Schema({
   rate: { type: Number },
   comment: { type: String, trim: true, maxLength: 450 },
-  user: { type: mongoose.Schema.ObjectId, ref: "User", required: true },
+  // user: { type: mongoose.Schema.ObjectId, ref: "User", required: true },
   createdAt: { type: Date, default: Date.now },
 });
 const doctorSchema = new mongoose.Schema({
@@ -32,11 +32,11 @@ const doctorSchema = new mongoose.Schema({
   specialties: [specialtySchema],
   DOB: { type: Date, default: Date.now },
   gender: { type: String, enum: ["male", "female", "other"], lowercase: true, trim: true },
-  contactDetails: [phoneNumberSchema],
-  address: [addressSchema],
+  contactDetails: {phoneNumberSchema},
+  address: {addressSchema},
   registerAt: { type: Date, default: Date.now },
   languages: [languagesSchema],
-  reviews: [reviewSchema],
+  reviews: {reviewSchema},
   // boolean value to decide if account is active or not
   //by default is un-active
   active: {type: Boolean, default: 0 },

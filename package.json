@@ -1,10 +1,11 @@
 {
-  "name": "movie-rest-api",
+  "name": "FindMeADoc-REST-api",
   "version": "1.0.0",
-  "description": "A style guide application for SEI",
+  "description": "Group project by Julie, Taher and Zan using MERN stack",
   "main": "index.js",
   "scripts": {
     "dev": "npx nodemon server.js",
+    "seed": "node db/seed.js",
     "test": "node --experimental-vm-modules --no-warnings  node_modules/.bin/jest -i --verbose --watch"
   },
   "author": "",
