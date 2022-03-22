@@ -63,6 +63,7 @@ async function register(req, res, next) {
     res.status(200).json({
       message:
         "registration successful, login please to complete your registration to activate your account.",
+      code,
     });
   } catch (err) {
     next(err);
@@ -99,10 +100,21 @@ async function login(req, res, next) {
 }
 //when users complete their profiles then account will assigned as completed
 async function verifyAccount(req, res, nex) {
-  console.log(req.body)
   const { email, code } = req.body
+  console.log(email, code)
   //user will attach the code with their email then we check if match then user account will be activated
     try{
+      const user = await User.findOne({
+        email: email
+      })
+      console.log(user)
+      if(!user) throw new Error("invalid")
+      if (user.activationCode !== code)
+        res.status(400).json({ message: "invalid activation code" });
+      //user existed and code is right ==> we need to set account as active and save data
+      user.active = 1
+      await user.save()
+      res.status(200).json({ message: "Account activated, login please to complete your information"})
     } catch(err) {
     }
 }

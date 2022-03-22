@@ -24,7 +24,7 @@ const patientSchema = new mongoose.Schema({
   email: { type: String, unique: true, lowercase: true, required: true },
   // boolean value to decide if account is active or not
   //by default is un-active
-  active: { type: Boolean, default: 0 },
+  // active: { type: Boolean, default: 0 },
   completed: { type: Boolean, default: 0 }
   //profile pic url
   //profilePic: { type:string }
