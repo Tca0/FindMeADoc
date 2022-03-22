@@ -60,7 +60,7 @@ async function register(req, res, next) {
 }
 //verify account with code 
 async function verifyAccount(req, res, next) {
-  console.log(req.body)
+  console.log(req.body.code)
   try{
     //check user id is right
     //should invitation link has user id
