@@ -43,8 +43,21 @@ async function register(req, res, next) {
     const createdUser = await User.create({
       ...newUser,
       password: hashedPassword,
-      active: 1,
+      //active account will be after verification process
     });
+    //According to the role add user to the right schema
+    if(createdUser.role === "patient") {
+      const newPatient = await Patient.create({
+        email: createdUser.email,
+        //active account will be after verification process
+      });
+      if(createdUser.role === "doctor") {
+        const newDoctor = await Doctor.create({
+          email: createdUser.email,
+          //active account will be after verification process
+        });
+      }
+    }
     res.status(200).json({
       message:
         "registration successful, login please to complete your registration to activate your account.",
@@ -83,15 +96,17 @@ async function login(req, res, next) {
   }
 }
 //when users complete their profiles then account will assigned as completed
-async function completeRegistration(req, res, nex) {
+async function verifyAccount(req, res, nex) {
+  console.log(req.body)
+  const { email, code } = req.body
+  //user will attach the code with their email then we check if match then user account will be activated
     try{
-
     } catch(err) {
-        
     }
 }
 export default {
   getUsersList,
   register,
   login,
+  verifyAccount
 };
