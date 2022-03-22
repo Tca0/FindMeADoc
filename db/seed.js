@@ -1,8 +1,8 @@
 import { connectToDb, disconnectDb, dropDatabase } from './helpers.js'
 import Doctor from "../models/doctor.js"
-// import User from "../models/user.js"
+import Patient from "../models/patient.js"
 import doctorData from "./data/doctor.js"
-// import userData from "../data/user.js"
+import patientData from "./data/patient.js"
 
 async function seed(){
     console.log("About to connect to db.")
@@ -12,11 +12,11 @@ async function seed(){
     await dropDatabase()
 
     console.log("Seeding data")
-    const doctors = Doctor.create(doctorData)
+    const doctors = await Doctor.create(doctorData)
     console.log(`${doctors.length} doctors available`)
 
-    // const users = User.create(userData)
-    // console.log(`${users.length} users available`)
+    const patients = await Patient.create(patientData)
+    console.log(`${patients.length} patients available`)
 
     await disconnectDb()
     console.log("finished")

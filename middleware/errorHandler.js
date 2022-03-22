@@ -23,4 +23,11 @@ export default function errorHandler(err, req, res, next) {
   if (err.message.includes("invalid email")) {
     return res.status(405).json({ message: "please use a valid email format" });
   }
+
+  if (err.name === "JsonWebTokenError") {
+    return res.status(400).json({ message: "Could not verify JWT." })
+  }
+  
+  //default error
+  res.sendStatus(500)
 }
