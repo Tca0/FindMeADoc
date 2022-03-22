@@ -40,18 +40,20 @@ async function register(req, res, next) {
     //hashing password
     const salt = await bcrypt.genSalt(8);
     const hashedPassword = await bcrypt.hash(newUser.password, salt);
+    const code = Math.floor(100000 + Math.random() * 900000); //Generate random 6 digit code.
     const createdUser = await User.create({
       ...newUser,
       password: hashedPassword,
+      activationCode: code
       //active account will be after verification process
     });
     //According to the role add user to the right schema
-    if(createdUser.role === "patient") {
+    if (createdUser.role === "patient") {
       const newPatient = await Patient.create({
         email: createdUser.email,
         //active account will be after verification process
       });
-      if(createdUser.role === "doctor") {
+      if (createdUser.role === "doctor") {
         const newDoctor = await Doctor.create({
           email: createdUser.email,
           //active account will be after verification process
