@@ -8,6 +8,11 @@ router.get("/", (req, res) => {
 // get users, register, login routs
 router.route("/users").get(userController.getUsersList);
 router.route("/users/register").post(userController.register);
-router.route("/users/login").post([check("email", "Should be an email").isEmail()],userController.login);
-
+router
+  .route("/users/login")
+  .post([check("email", "Should be an email").isEmail()], userController.login
+  );
+router
+  .route("/users/verifyAccount")
+  .patch(userController.verifyAccount);
 export default router

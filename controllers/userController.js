@@ -19,15 +19,15 @@ async function register(req, res, next) {
   // get email, verify if users already exist
   // if not added to the right document as well, activate the account
   console.log(req.body);
+  // let expiry = Date.now() + 60 * 1000 * 15; //Set expiry 15 mins ahead from now
   try {
     //exists function return objectId if user existed otherwise will return a null
     const existedUser = await User.exists({ email: req.body.email });
     console.log(existedUser);
     //if user is registered but the account was deleted which means the account is unavailable more
     // then they need to re-activate their accounts again
-    if (existedUser && existedUser.available === 0)
-      throw new Error("re-active");
-    if (existedUser && existedUser.active === 0)
+    if (existedUser && existedUser.active === 0) throw new Error("re-active");
+    if (existedUser && existedUser.completed === 0)
       throw new Error("profile not completed");
     if (existedUser) throw new Error("user existed");
     if (req.body.password !== req.body.confirmPassword)
@@ -40,17 +40,34 @@ async function register(req, res, next) {
     //hashing password
     const salt = await bcrypt.genSalt(8);
     const hashedPassword = await bcrypt.hash(newUser.password, salt);
+    const code = Math.floor(100000 + Math.random() * 900000); //Generate random 6 digit code.
+    // newUser.activationCode = code
+    // console.log(newUser)
     const createdUser = await User.create({
       ...newUser,
       password: hashedPassword,
-      active: 1,
+      active: 0,
+      activationCode: code,
     });
     res.status(200).json({
-      message:
-        "registration successful, login please to complete your registration to activate your account.",
+      message: "registration successful, verify your account using code",
+      code,
     });
+    console.log(createdUser)
   } catch (err) {
     next(err);
+  }
+}
+//verify account with code 
+async function verifyAccount(req, res, next) {
+  console.log(req.body)
+  try{
+    //check user id is right
+    //should invitation link has user id
+    // check valid key
+    //if it's right activate and reset code to null
+  } catch(err) {
+
   }
 }
 //login process and generating a token
@@ -93,5 +110,6 @@ async function completeRegistration(req, res, nex) {
 export default {
   getUsersList,
   register,
+  verifyAccount,
   login,
 };
