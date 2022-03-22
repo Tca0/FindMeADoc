@@ -35,6 +35,7 @@ const doctorSchema = new mongoose.Schema({
   active: {type: Boolean, default: 0 },
   //profile pic url
   //profilePic: { type:string }
+  about: {type: String},
   experience: { type: Number}
 });
 
