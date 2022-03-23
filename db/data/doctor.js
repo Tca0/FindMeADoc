@@ -1,29 +1,72 @@
 export default [
     {
-        firstName: "firstName",
-        secondName: "secondName",
-        fullName: "firstName secondName",
+        firstName: "Mich",
+        secondName: "Brown",
+        fullName: "Mich Brown",
         email: "first@mail.com",
-        specialties: ["first speciality","second speciality"],
-        DOB: "1990-01-01",
+        specialties: ["surgeon","GP"],
+        // DOB: "1990-01-01",
         gender: "other",
-        contactDetails: 123456,
+        contactNumber: 123456,
         address: {
             addressLine1: "First Road",
-            addressLine1: "Second Road",
+            addressLine2: "Second Road",
             town: "Some Random Town One",
             country: "Some Random Country One",
-            postcode: "SRPC1",
+            postcode: "SE1",
             // enteredDate: { type: Date, default: Date.now },
         },
         //   registerAt: { type: Date, default: Date.now },
         languages: ["languageese","languagian"],
-        reviews: {rate:3,comment:"had better"},
+        reviews: [{rate:4,comment:"Done the job, but did not speak the same language"}],
         active: false,
         experience: 1
-        
-    },{
-        
-    }
+    },
+    {
+        firstName: "Allan",
+        secondName: "Al",
+        fullName: "Allan Al",
+        email: "second@mail.com",
+        specialties: ["cardiologist","GP"],
+        // DOB: "1990-01-01",
+        gender: "male",
+        contactNumber: 654321,
+        address: {
+            addressLine1: "First Road",
+            addressLine2: "Second Road",
+            town: "Some Random Town Two",
+            country: "Some Random Country Two",
+            postcode: "SE2",
+            // enteredDate: { type: Date, default: Date.now },
+        },
+        //   registerAt: { type: Date, default: Date.now },
+        languages: ["english","french"],
+        reviews: [{rate:5,comment:"Heartwarming service!"}],
+        active: true,
+        experience: 2
+    },
+    {
+        firstName: "Beatric",
+        secondName: "Bein",
+        fullName: "Beatric Bein",
+        email: "third@mail.com",
+        specialties: ["neurologist"],
+        // DOB: "1990-01-01",
+        gender: "female",
+        contactNumber: 147258,
+        address: {
+            addressLine1: "First Road",
+            addressLine2: "Second Road",
+            town: "Some Random Town Three",
+            country: "Some Random Country Three",
+            postcode: "SE3",
+            // enteredDate: { type: Date, default: Date.now },
+        },
+        //   registerAt: { type: Date, default: Date.now },
+        languages: ["esperanto","dutch"],
+        reviews: [{rate:5,comment:"Expertise in this field blown my mind"}],
+        active: true,
+        experience: 5
+    },
 
 ]
