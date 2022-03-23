@@ -10,7 +10,7 @@ export default [
         contactNumber: 123456,
         address: {
             addressLine1: "First Road",
-            addressLine1: "Second Road",
+            addressLine2: "Second Road",
             town: "Some Random Town One",
             country: "Some Random Country One",
             postcode: "SE1",
@@ -33,7 +33,7 @@ export default [
         contactNumber: 654321,
         address: {
             addressLine1: "First Road",
-            addressLine1: "Second Road",
+            addressLine2: "Second Road",
             town: "Some Random Town Two",
             country: "Some Random Country Two",
             postcode: "SE2",
@@ -56,7 +56,7 @@ export default [
         contactNumber: 147258,
         address: {
             addressLine1: "First Road",
-            addressLine1: "Second Road",
+            addressLine2: "Second Road",
             town: "Some Random Town Three",
             country: "Some Random Country Three",
             postcode: "SE3",

@@ -1,6 +1,6 @@
 import express from "express";
 import userController from "../controllers/userController.js";
-// import patientController from "../controllers/patientController.js"
+import patientController from "../controllers/patientController.js"
 import doctorController from "../controllers/doctorController.js"
 // import reviewController from "../controllers/reviewController.js"
 // import auth from "../middleware/auth.js"
@@ -34,14 +34,28 @@ router.get("/", (req, res) => {
   res.status(200).send("API Running")
 })
 
+router.route("/patients")
+  .get(patientController.findPatients)
+  .post(patientController.createPatient)
+
+  router.route("/patients/:patientID")
+  .get(patientController.showPatient)
+  //! add auth
+  .put(patientController.updatePatient)
+  //! add auth
+  .delete(patientController.removePatient)
+
+
+
 router.route("/doctors")
   .get(doctorController.findDoctors)
   .post(doctorController.createDoctor)
 
-//! add auth
 router.route("/doctor/:doctorID")
   .get(doctorController.showDoctor)
+  //! add auth
   .put(doctorController.updateDoctor)
+  //! add auth
   .delete(doctorController.removeDoctor)
 
 // doctor reviews

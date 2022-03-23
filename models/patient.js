@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 const addressSchema = new mongoose.Schema({
   addressLine1: { type: String, maxLength: 255, lowercase: true, trim: true },
-  addressLine1: { type: String, maxLength: 255, lowercase: true, trim: true },
+  addressLine2: { type: String, maxLength: 255, lowercase: true, trim: true },
   town: { type: String, maxLength: 35, lowercase: true, trim: true },
   country: { type: String, maxLength: 35, lowercase: true, trim: true },
   postcode: { type: String, maxLength: 8, lowercase: true, trim: true },

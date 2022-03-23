@@ -6,7 +6,7 @@ export default [
     gender: "other",
     address: {
             addressLine1: "First Road",
-            addressLine1: "Second Road",
+            addressLine2: "Second Road",
             town: "Big Town",
             country: "UK",
             postcode: "SE1",
@@ -28,7 +28,7 @@ export default [
     gender: "female",
     address: {
             addressLine1: "First Road",
-            addressLine1: "Second Road",
+            addressLine2: "Second Road",
             town: "Big Town",
             country: "UK",
             postcode: "SE2",
@@ -50,7 +50,7 @@ export default [
     gender: "male",
     address: {
             addressLine1: "First Road",
-            addressLine1: "Second Road",
+            addressLine2: "Second Road",
             town: "Small Town",
             country: "UK",
             postcode: "SE3",
