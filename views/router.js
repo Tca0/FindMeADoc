@@ -22,12 +22,6 @@ router
   .route("/users/verifyAccount")
   .patch(userController.verifyAccount);
 
-// patients
-//! add auth
-// router.route("/users/:patientID")
-//   .get(patientController.search)
-//   .put(patientController.update)
-//   .delete(patientController.remove)
 
 // doctors
 router.get("/", (req, res) => {
