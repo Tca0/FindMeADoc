@@ -4,7 +4,7 @@ import User from "../models/user.js";
 import Patient from "../models/patient.js";
 import Doctor from "../models/doctor.js";
 import { validationResult } from "express-validator";
-import passwordsFunctions from "../middleware/passwordsFunctions.js"
+import passwordsFunctions from "../db/helpers/passwordsFunctions.js"
 // get all users
 async function getUsersList(req, res, next) {
   try {
