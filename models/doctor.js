@@ -1,15 +1,13 @@
 import mongoose from "mongoose";
 const addressSchema = new mongoose.Schema({
   addressLine1: { type: String, maxLength: 255, lowercase: true, trim: true },
-  addressLine1: { type: String, maxLength: 255, lowercase: true, trim: true },
+  addressLine2: { type: String, maxLength: 255, lowercase: true, trim: true },
   town: { type: String, maxLength: 35, lowercase: true, trim: true },
   country: { type: String, maxLength: 35, lowercase: true, trim: true },
   postcode: { type: String, maxLength: 8, lowercase: true, trim: true },
   enteredDate: { type: Date, default: Date.now },
 });
-const phoneNumberSchema = new mongoose.Schema({
-  contactNumber: { type: Number },
-});
+
 //for now each user can do one rating and 1 comment
 const reviewSchema = new mongoose.Schema({
   rate: { type: Number },
@@ -25,8 +23,8 @@ const doctorSchema = new mongoose.Schema({
   specialties: [{type: String}],
   DOB: { type: Date, default: Date.now },
   gender: { type: String, enum: ["male", "female", "other"], lowercase: true, trim: true },
-  contactDetails: {phoneNumberSchema},
-  address: {addressSchema},
+  contactNumber: {type:Number},
+  address: [addressSchema],
   registerAt: { type: Date, default: Date.now },
   languages: [{type: String}],
   reviews: [reviewSchema],

@@ -7,7 +7,7 @@ export default [
         specialties: ["surgeon","GP"],
         // DOB: "1990-01-01",
         gender: "other",
-        contactDetails: 123456,
+        contactNumber: 123456,
         address: {
             addressLine1: "First Road",
             addressLine1: "Second Road",
@@ -30,7 +30,7 @@ export default [
         specialties: ["cardiologist","GP"],
         // DOB: "1990-01-01",
         gender: "male",
-        contactDetails: 654321,
+        contactNumber: 654321,
         address: {
             addressLine1: "First Road",
             addressLine1: "Second Road",
@@ -53,7 +53,7 @@ export default [
         specialties: ["neurologist"],
         // DOB: "1990-01-01",
         gender: "female",
-        contactDetails: 147258,
+        contactNumber: 147258,
         address: {
             addressLine1: "First Road",
             addressLine1: "Second Road",
