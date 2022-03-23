@@ -12,3 +12,4 @@ npm install jsonwebtoken
 npm i bcrypt
 npm i --save bcrypt 
 npm i dotenv
+npm install nodemailer
