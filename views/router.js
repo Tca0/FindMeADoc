@@ -2,7 +2,7 @@ import express from "express";
 import userController from "../controllers/userController.js";
 import patientController from "../controllers/patientController.js"
 import doctorController from "../controllers/doctorController.js"
-// import reviewController from "../controllers/reviewController.js"
+import reviewController from "../controllers/reviewController.js"
 // import auth from "../middleware/auth.js"
 import { check } from "express-validator";
 
@@ -59,20 +59,21 @@ router.route("/doctor/:doctorID")
   .delete(doctorController.removeDoctor)
 
 // doctor reviews
-// router.route("/:doctorID/reviews")
-//   .post(
+router.route("/doctor/:doctorID/reviews")
+  .post(
 //     auth,
-//     [
-//       check("comments", "Comments are missing").notEmpty(),
-//       check("rating", "Please provide rating").notEmpty(),
-//       check("rating", "Has to be an integer").isInt(),
-//     ],
-//     reviewController.create
-//   );
+    // [
+    //   check("comments", "Comments are missing").notEmpty(),
+    //   check("rating", "Please provide rating").notEmpty(),
+    //   check("rating", "Has to be an integer").isInt(),
+    // ],
+    reviewController.create
+  );
 
-// router
-//   .route("/:doctorID/reviews/:reviewID")
-//   .put(auth, commentController.update)
-//   .delete(auth, commentController.remove);
+  //!add auth
+router
+  .route("/doctor/:doctorID/review/:reviewID")
+  .put(reviewController.update)
+  .delete(reviewController.remove);
 
 export default router
