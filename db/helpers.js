@@ -6,7 +6,7 @@ export function connectToDb() {
   };
   const connectToDb = process.env.CONNECTION_STRING
     ? process.env.CONNECTION_STRING
-    : "mongodb://127.0.0.1:27017/findADoc";
+    : "mongodb://127.0.0.1:27017/findMeADoc";
   return mongoose.connect(connectToDb, opts);
   //   return mongoose.connect("mongodb://127.0.0.1:27017/findADoc", opts);
 }
