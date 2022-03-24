@@ -12,6 +12,7 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "@types/nodemailer": "^6.4.4",
     "bcrypt": "^5.0.1",
     "command": "^0.0.5",
     "cors": "^2.8.5",
@@ -22,6 +23,7 @@
     "jsonwebtoken": "^8.5.1",
     "mongo-sanitize": "^1.1.0",
     "mongoose": "^6.2.7",
+    "nodemailer": "^6.7.3",
     "validator": "^13.7.0"
   },
   "devDependencies": {
