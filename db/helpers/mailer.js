@@ -12,7 +12,7 @@ const transport = nodemailer.createTransport({
     clientSecret: process.env.CLIENT_SECRET,
   },
 });
-export default async function sendConfirmationEmail(toAddress, code) {
+async function sendConfirmationEmail(toAddress, code) {
   console.log(`trying to sent email to ${toAddress} with code ${code}`);
   console.log(transport)
   try {
@@ -26,6 +26,7 @@ export default async function sendConfirmationEmail(toAddress, code) {
       html: `<h1>Email Confirmation</h1>
         <h2>Hello</h2>
         <p>Thank you for subscribing. Please confirm your email by clicking on the following link</p>
+        // should be linked to the front end
         <a href=http://localhost:4000/confirm/${code}> Click here</a>
         </div>`,
     });
@@ -33,4 +34,27 @@ export default async function sendConfirmationEmail(toAddress, code) {
   catch(err) {
     console.log(err)
   }
+}
+async function sendResetPasswordEmail(toAddress, code){
+  try{
+    console.log("sending reset password code to:", toAddress)
+    transport.sendMail({
+      from: process.env.EMAIL,
+      to: toAddress,
+      subject: "Reset Password Request",
+      html: `<h1>Reset password</h1>
+        <h2>Hello</h2>
+        <p>click on the link to reset your password ${code}</p>
+        // should be linked to the front end
+        <a href=http://localhost:4000/confirm/${code}> Click here</a>
+        </div>`,
+    });
+  } catch(err){
+    console.log("email not send")
+    console.log(err)
+  }
+}
+export default {
+  sendConfirmationEmail,
+  sendResetPasswordEmail
 }

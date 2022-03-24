@@ -13,9 +13,9 @@ export default async function auth(req, res, next) {
       return res.status(401).json({ message: "Unauthorized" });
     }
     const token = rawToken.split(" ")[1].trim();
-      console.log(token)
+      console.log("token",token)
     const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-    console.log(decodedToken)
+    console.log("payload from decodedToken", decodedToken);
     const user = await User.findOne({ email: decodedToken.email });
     console.log(user)
     if (!user) throw new Error("Not registered");

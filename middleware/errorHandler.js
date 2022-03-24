@@ -1,5 +1,5 @@
 export default function errorHandler(err, req, res, next) {
-  console.log("error", err.message);
+  // console.log("error", err.message);
   if (err.message === "empty DB") {
     return res.status(404).json({ message: "No users registered" });
   }
@@ -27,7 +27,12 @@ export default function errorHandler(err, req, res, next) {
   if (err.name === "JsonWebTokenError") {
     return res.status(400).json({ message: "Could not verify JWT." })
   }
-
-  //default error
-  res.sendStatus(500)
+  if (err.message === "Not active") {
+    return res.status(400).json({message: "Please verify your account to login, an email sent to you with verification code"})
+  }
+  if(err.message === "no email") {
+    return res.status(400).json({ message: "please enter your email address"})
+  }
+    //default error
+    res.sendStatus(500);
 }

@@ -6,6 +6,8 @@ import Doctor from "../models/doctor.js";
 import { validationResult } from "express-validator";
 import passwordsFunctions from "../db/helpers/passwordsFunctions.js";
 import sendConfirmationEmail from "../db/helpers/mailer.js";
+// import sendResetPasswordEmail from "../db/helpers/mailer.js";
+import mailer from "../db/helpers/mailer.js"
 // get all users
 async function getUsersList(req, res, next) {
   try {
@@ -24,7 +26,7 @@ async function register(req, res, next) {
     //if user is registered but the account was deleted which means the account is unavailable more
     // then they need to re-activate their accounts again
 
-    if (existedUser && existedUser.active === 0) throw new Error("not active")
+    if (existedUser && existedUser.active === 0) throw new Error("not active");
     if (existedUser) throw new Error("user existed");
     if (
       !passwordsFunctions.confirmPassword(
@@ -73,23 +75,12 @@ async function register(req, res, next) {
       message: "registration successful, verify your account using code",
       code,
     });
-    console.log(createdUser)
+    console.log(createdUser);
   } catch (err) {
     next(err);
   }
 }
-//verify account with code 
-async function verifyAccount(req, res, next) {
-  console.log(req.body.code)
-  try{
-    //check user id is right
-    //should invitation link has user id
-    // check valid key
-    //if it's right activate and reset code to null
-  } catch(err) {
 
-  }
-}
 //login process and generating a token
 async function login(req, res, next) {
   try {
@@ -100,6 +91,7 @@ async function login(req, res, next) {
     const user = await User.findOne({ email: req.body.email });
     // console.log(user);
     if (!user) throw new Error("invalid login");
+    if (!user.active) throw new Error("Not active");
     //it will compare the entered password with the hashed one(remember that)
     const isItMatch = await passwordsFunctions.comparePassword(
       user.password,
@@ -152,7 +144,7 @@ async function changePassword(req, res, next) {
   // if it's match then it will check if new password and confirmPassword match
   //if it's then will set the new password after hashing it.
   const { oldPassword, newPassword, confirmPassword } = req.body;
-  console.log(req.body.currentUser)
+  console.log(req.body.currentUser);
   try {
     const isItMatch = await passwordsFunctions.comparePassword(
       req.currentUser.password,
@@ -173,6 +165,24 @@ async function changePassword(req, res, next) {
     next(err);
   }
 }
+async function forgotPassword(req, res, next) {
+  console.log(req.body);
+  try {
+    if (JSON.stringify(req.body) === '{}') throw new Error("no email");
+    const errors = validationResult(req);
+    console.log(errors.errors);
+    if (errors.errors.length !== 0) throw new Error("invalid email format");
+    const { email } = req.body;
+    const user = User.findOne({ email: email });
+    if (!user) throw new Error("not registered");
+    const code = Math.floor(100000 + Math.random() * 900000);
+    //trying to store the value of sending male value in a variable but undefined
+    await mailer.sendResetPasswordEmail(email, code);
+    res.status(200).json({ message: "check your email please", code})
+  } catch (err) {
+    next(err);
+  }
+}
 export default {
   getUsersList,
   register,
@@ -180,4 +190,5 @@ export default {
   login,
   verifyAccount,
   changePassword,
+  forgotPassword,
 };
