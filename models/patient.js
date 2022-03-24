@@ -8,18 +8,24 @@ const addressSchema = new mongoose.Schema({
   enteredDate: { type: Date, default: Date.now },
 });
 const patientSchema = new mongoose.Schema({
-  firstName: { type: String, required: true, lowercase: true, trim: true },
-  secondName: { type: String, required: true, lowercase: true, trim: true },
-  fullName: { type: String, unique: true, required: true, toLowerCase: true },
+  firstName: { type: String, lowercase: true, trim: true },
+  secondName: { type: String, lowercase: true, trim: true },
+  fullName: { type: String, toLowerCase: true },
   DOB: { type: Date, default: Date.now },
-  gender: { type: String, enum: ["male", "female", "other"], lowercase: true, trim: true },
+  gender: {
+    type: String,
+    enum: ["male", "female", "other"],
+    lowercase: true,
+    trim: true,
+  },
   address: [addressSchema],
   registerAt: { type: Date, default: Date.now },
   phone: { type: Number },
   email: { type: String, unique: true, lowercase: true, required: true },
   // boolean value to decide if account is active or not
   //by default is un-active
-  active: { type: Boolean, default: 0 },
+  // active: { type: Boolean, default: 0 },
+  completed: { type: Boolean, default: 0 }
   //profile pic url
   //profilePic: { type:string }
 });
