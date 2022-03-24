@@ -87,14 +87,6 @@ async function login(req, res, next) {
     // console.log(user);
     if (!user) throw new Error("invalid login");
     //it will compare the entered password with the hashed one(remember that)
-
-    // const passwordsMatch = await bcrypt.compare(
-    //   req.body.password,
-    //   user.password
-    // );
-    // console.log(passwordsMatch);
-    // if (!passwordsMatch) throw new Error("invalid login");
-
     const isItMatch = await passwordsFunctions.comparePassword(
       user.password,
       req.body.password
@@ -146,6 +138,7 @@ async function changePassword(req, res, next) {
   // if it's match then it will check if new password and confirmPassword match
   //if it's then will set the new password after hashing it.
   const { oldPassword, newPassword, confirmPassword } = req.body;
+  console.log(req.body.currentUser)
   try {
     const isItMatch = await passwordsFunctions.comparePassword(
       req.currentUser.password,

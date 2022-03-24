@@ -25,7 +25,8 @@ export default async function sendConfirmationEmail(toAddress, code) {
       subject: "confirmation email",
       html: `<h1>Email Confirmation</h1>
         <h2>Hello</h2>
-        <p>Thank you for subscribing. Please confirm your email by clicking on the following link ${code}</p>
+        <p>Thank you for subscribing. Please confirm your email by clicking on the following link</p>
+        <a href=http://localhost:4000/confirm/${code}> Click here</a>
         </div>`,
     });
   }
