@@ -1,8 +1,8 @@
 import express from "express";
 import userController from "../controllers/userController.js";
-import patientController from "../controllers/patientController.js"
-import doctorController from "../controllers/doctorController.js"
-import reviewController from "../controllers/reviewController.js"
+import patientController from "../controllers/patientController.js";
+import doctorController from "../controllers/doctorController.js";
+import reviewController from "../controllers/reviewController.js";
 // import auth from "../middleware/auth.js"
 import { check } from "express-validator";
 
@@ -16,58 +16,58 @@ router.route("/users").get(userController.getUsersList);
 router.route("/users/register").post(userController.register);
 router
   .route("/users/login")
-  .post([check("email", "Should be an email").isEmail()], userController.login
-  );
-router
-  .route("/users/verifyAccount")
-  .patch(userController.verifyAccount);
-
+  .post([check("email", "Should be an email").isEmail()], userController.login);
+router.route("/users/verifyAccount").patch(userController.verifyAccount);
 
 // doctors
 router.get("/", (req, res) => {
-  res.status(200).send("API Running")
-})
+  res.status(200).send("API Running");
+});
 
-router.route("/patients")
+router
+  .route("/patients")
   .get(patientController.findPatients)
-  .post(patientController.createPatient)
+  .post(patientController.createPatient);
 
-  router.route("/patients/:patientID")
+router
+  .route("/patients/:patientID")
   .get(patientController.showPatient)
   //! add auth
   .put(patientController.updatePatient)
   //! add auth
-  .delete(patientController.removePatient)
+  .delete(patientController.removePatient);
 
-
-
-router.route("/doctors")
+router
+  .route("/doctors")
   .get(doctorController.findDoctors)
-  .post(doctorController.createDoctor)
+  .post(doctorController.createDoctor);
 
-router.route("/doctor/:doctorID")
+//find doctor(s)
+router.route("/doctor").get(doctorController.searchByPostcode);
+
+router
+  .route("/doctor/:doctorID")
   .get(doctorController.showDoctor)
   //! add auth
   .put(doctorController.updateDoctor)
   //! add auth
-  .delete(doctorController.removeDoctor)
+  .delete(doctorController.removeDoctor);
 
 // doctor reviews
-router.route("/doctor/:doctorID/reviews")
-  .post(
-//     auth,
-    // [
-    //   check("comments", "Comments are missing").notEmpty(),
-    //   check("rating", "Please provide rating").notEmpty(),
-    //   check("rating", "Has to be an integer").isInt(),
-    // ],
-    reviewController.create
-  );
+router.route("/doctor/:doctorID/reviews").post(
+  //     auth,
+  // [
+  //   check("comments", "Comments are missing").notEmpty(),
+  //   check("rating", "Please provide rating").notEmpty(),
+  //   check("rating", "Has to be an integer").isInt(),
+  // ],
+  reviewController.create
+);
 
-  //!add auth
+//!add auth
 router
   .route("/doctor/:doctorID/review/:reviewID")
   .put(reviewController.update)
   .delete(reviewController.remove);
 
-export default router
+export default router;
