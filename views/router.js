@@ -16,49 +16,52 @@ router.route("/users/register").post(userController.register);
 router.route("/users/login").post([check("email", "Should be an email").isEmail()],userController.login)
 router.route("/users/verifyAccount").patch(userController.verifyAccount)
 router.route("/users/changePassword").patch(auth, userController.changePassword);
+
 // doctors
-
-
-router.route("/patients")
+router
+  .route("/patients")
   .get(patientController.findPatients)
-  .post(patientController.createPatient)
+  .post(patientController.createPatient);
 
-  router.route("/patients/:patientID")
+router
+  .route("/patients/:patientID")
   .get(patientController.showPatient)
   //! add auth
   .put(patientController.updatePatient)
   //! add auth
-  .delete(patientController.removePatient)
+  .delete(patientController.removePatient);
 
-
-
-router.route("/doctors")
+router
+  .route("/doctors")
   .get(doctorController.findDoctors)
-  .post(doctorController.createDoctor)
+  .post(doctorController.createDoctor);
 
-router.route("/doctor/:doctorID")
+//find doctor(s)
+router.route("/doctor").get(doctorController.searchByPostcode);
+
+router
+  .route("/doctor/:doctorID")
   .get(doctorController.showDoctor)
   //! add auth
   .put(doctorController.updateDoctor)
   //! add auth
-  .delete(doctorController.removeDoctor)
+  .delete(doctorController.removeDoctor);
 
 // doctor reviews
-router.route("/doctor/:doctorID/reviews")
-  .post(
-//     auth,
-    // [
-    //   check("comments", "Comments are missing").notEmpty(),
-    //   check("rating", "Please provide rating").notEmpty(),
-    //   check("rating", "Has to be an integer").isInt(),
-    // ],
-    reviewController.create
-  );
+router.route("/doctor/:doctorID/reviews").post(
+  //     auth,
+  // [
+  //   check("comments", "Comments are missing").notEmpty(),
+  //   check("rating", "Please provide rating").notEmpty(),
+  //   check("rating", "Has to be an integer").isInt(),
+  // ],
+  reviewController.create
+);
 
-  //!add auth
+//!add auth
 router
   .route("/doctor/:doctorID/review/:reviewID")
   .put(reviewController.update)
   .delete(reviewController.remove);
 
-export default router
+export default router;
