@@ -7,6 +7,8 @@ const userSchema = new mongoose.Schema({
     maxLength: 50,
     lowercase: true,
     trim: true,
+
+    validate: [isEmail, "invalid email"],
   },
   password: { type: String, required: true },
   role: {
@@ -16,6 +18,7 @@ const userSchema = new mongoose.Schema({
   },
   registeredAt: { type: Date, default: Date.now },
   active: { type: Boolean, default: 0 },
+  completed: { type: Boolean, default: 0 },
   activationCode: { type: String, default: null },
 });
 

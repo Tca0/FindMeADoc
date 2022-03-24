@@ -24,4 +24,10 @@ export default function errorHandler(err, req, res, next) {
   if(err.message === "invalid old password") {
     res.status(400).json({message: "old password doesn't match"})
   }
+  if (err.name === "JsonWebTokenError") {
+    return res.status(400).json({ message: "Could not verify JWT." })
+  }
+
+  //default error
+  res.sendStatus(500)
 }

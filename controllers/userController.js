@@ -23,7 +23,8 @@ async function register(req, res, next) {
     const existedUser = await User.exists({ email: req.body.email });
     //if user is registered but the account was deleted which means the account is unavailable more
     // then they need to re-activate their accounts again
-    if (existedUser && existedUser.active === 0) throw new Error("not active");
+
+    if (existedUser && existedUser.active === 0) throw new Error("not active")
     if (existedUser) throw new Error("user existed");
     if (
       !passwordsFunctions.confirmPassword(
@@ -40,6 +41,7 @@ async function register(req, res, next) {
     };
     console.log(newUser);
     //hashing password
+
     // const salt = await bcrypt.genSalt(8);
     // const hashedPassword = await bcrypt.hash(newUser.password, salt);
     const password = await passwordsFunctions.hashPassword(newUser.password);
@@ -68,12 +70,24 @@ async function register(req, res, next) {
     console.log("calling send mail function");
     await sendConfirmationEmail(createdUser.email, code);
     res.status(200).json({
-      message:
-        "registration successful, login please to complete your registration to activate your account.",
+      message: "registration successful, verify your account using code",
       code,
     });
+    console.log(createdUser)
   } catch (err) {
     next(err);
+  }
+}
+//verify account with code 
+async function verifyAccount(req, res, next) {
+  console.log(req.body.code)
+  try{
+    //check user id is right
+    //should invitation link has user id
+    // check valid key
+    //if it's right activate and reset code to null
+  } catch(err) {
+
   }
 }
 //login process and generating a token
@@ -169,6 +183,7 @@ async function changePassword(req, res, next) {
 export default {
   getUsersList,
   register,
+  verifyAccount,
   login,
   verifyAccount,
   changePassword,

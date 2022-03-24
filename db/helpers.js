@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-export function connectToDb() {
+export async function connectToDb() {
   const opts = {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -11,7 +11,7 @@ export function connectToDb() {
   //   return mongoose.connect("mongodb://127.0.0.1:27017/findADoc", opts);
 }
 
-export function disconnectDb() {
+export async function disconnectDb() {
   if (mongoose.connection !== 0) {
     return mongoose.disconnect();
   }
