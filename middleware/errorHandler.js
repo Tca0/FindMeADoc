@@ -1,5 +1,5 @@
 export default function errorHandler(err, req, res, next) {
-  // console.log("error", err.message);
+  console.log("error", err.message);
   if (err.message === "empty DB") {
     return res.status(404).json({ message: "No users registered" });
   }
@@ -9,7 +9,10 @@ export default function errorHandler(err, req, res, next) {
     if (err.message === "user existed") {
       return res.status(400).json({ message: "User already registered" });
     }
-  if (err.message.includes("invalid email")) {
+  if (
+    err.message.includes("invalid email") ||
+    err.message === "Invalid email"
+  ) {
     return res.status(405).json({ message: "please use a valid email format" });
   }
   if(err.message === "password not confirmed") {
@@ -32,6 +35,13 @@ export default function errorHandler(err, req, res, next) {
   }
   if(err.message === "no email") {
     return res.status(400).json({ message: "please enter your email address"})
+  }
+  if (err.message === "Invalid value") {
+    return res
+      .status(400)
+      .json({
+        message: "empty fields, please complete your registration form",
+      });
   }
     //default error
     res.sendStatus(500);

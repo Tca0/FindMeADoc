@@ -21,6 +21,11 @@ async function getUsersList(req, res, next) {
 }
 async function register(req, res, next) {
   try {
+    const errors = validationResult(req);
+    // console.log("first",errors)
+    console.log("second",errors.errors);
+    console.log("nestedErrors", errors.errors[0].msg)
+    if(errors.errors[0].msg) throw new Error(errors.errors[0].msg);
     //exists function return objectId if user existed otherwise will return a null
     const existedUser = await User.exists({ email: req.body.email });
     //if user is registered but the account was deleted which means the account is unavailable more

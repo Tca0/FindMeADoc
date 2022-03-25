@@ -4,6 +4,7 @@ import patientController from "../controllers/patientController.js"
 import doctorController from "../controllers/doctorController.js"
 import reviewController from "../controllers/reviewController.js"
 import { check } from "express-validator";
+import { oneOf } from "express-validator";
 import auth from "../middleware/auth.js";
 const router = express.Router();
 
@@ -12,8 +13,25 @@ router.get("/", (req, res) => {
 })
 // get users, register, login and verifyAccount routs
 router.route("/users").get(userController.getUsersList);
-router.route("/users/register").post(userController.register);
-router.route("/users/login").post([check("email", "Should be an email").isEmail()],userController.login)
+router
+  .route("/users/register")
+  .post(
+    [
+      check("email").exists(),
+      check("password").exists(),
+      check("confirmPassword").exists(),
+      check("email", "Invalid email").isEmail(),
+    ],
+    userController.register
+  );
+router
+  .route("/users/login")
+  .post(
+    [
+      check("email", "Should be an email").isEmail(),
+    ],
+    userController.login
+  );
 router.route("/users/verifyAccount").patch(userController.verifyAccount)
 router.route("/users/changePassword").patch(auth, userController.changePassword);
 router.route("/users/forgotPassword").get([check("email", "Should be an Email").isEmail()],userController.forgotPassword);
