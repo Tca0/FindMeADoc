@@ -33,8 +33,8 @@ export default function errorHandler(err, req, res, next) {
   if (err.message === "Not active") {
     return res.status(400).json({message: "Please verify your account to login, an email sent to you with verification code"})
   }
-  if(err.message === "no email") {
-    return res.status(400).json({ message: "please enter your email address"})
+  if (err.message === "email required") {
+    return res.status(400).json({ message: "please enter your email address" });
   }
   if (err.message === "Invalid value") {
     return res
@@ -42,6 +42,12 @@ export default function errorHandler(err, req, res, next) {
       .json({
         message: "empty fields, please complete your registration form",
       });
+  }
+  if(err.message === "password required") {
+    return res.status(400).json({message: "please enter your password"})
+  }
+  if (err.message === "confirmPassword required") {
+    return res.status(400).json({ message: "please confirm your password" });
   }
     //default error
     res.sendStatus(500);

@@ -20,6 +20,9 @@ router
       check("email").exists(),
       check("password").exists(),
       check("confirmPassword").exists(),
+      check("email", "email required").notEmpty(),
+      check("password", "password required").notEmpty(),
+      check("confirmPassword", "confirmPassword required").notEmpty(),
       check("email", "Invalid email").isEmail(),
     ],
     userController.register
@@ -28,7 +31,11 @@ router
   .route("/users/login")
   .post(
     [
-      check("email", "Should be an email").isEmail(),
+      check("email").exists(),
+      check("password").exists(),
+      check("email", "email required").notEmpty(),
+      check("password", "password required").notEmpty(),
+      check("email", "Invalid email").isEmail(),
     ],
     userController.login
   );

@@ -92,7 +92,7 @@ async function login(req, res, next) {
     //handle email format error
     const errors = validationResult(req);
     console.log(errors.errors);
-    if (errors.errors.length !== 0) throw new Error("invalid email format");
+    if (errors.errors.length !== 0) throw new Error(errors.errors[0].msg);
     const user = await User.findOne({ email: req.body.email });
     // console.log(user);
     if (!user) throw new Error("invalid login");
