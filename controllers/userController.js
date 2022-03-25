@@ -10,7 +10,9 @@ import sendConfirmationEmail from "../db/helpers/mailer.js";
 import mailer from "../db/helpers/mailer.js"
 // get all users
 async function getUsersList(req, res, next) {
+  const { currentUser } = body.req
   try {
+    if(currentUser.role !== "admin") throw new Error("no-authentication")
     const users = await User.find({ active: 1 });
     console.log(users);
     if (users.length === 0) throw new Error("empty DB");
@@ -150,7 +152,9 @@ async function changePassword(req, res, next) {
   //if it's then will set the new password after hashing it.
   const { oldPassword, newPassword, confirmPassword } = req.body;
   console.log(req.body.currentUser);
+  const errors = validationResult(req);
   try {
+    if (errors.errors.length !== 0) throw new Error(errors.errors[0].msg);
     const isItMatch = await passwordsFunctions.comparePassword(
       req.currentUser.password,
       oldPassword
@@ -173,10 +177,9 @@ async function changePassword(req, res, next) {
 async function forgotPassword(req, res, next) {
   console.log(req.body);
   try {
-    if (JSON.stringify(req.body) === '{}') throw new Error("no email");
     const errors = validationResult(req);
     console.log(errors.errors);
-    if (errors.errors.length !== 0) throw new Error("invalid email format");
+    if (errors.errors.length !== 0) throw new Error(errors.errors[0].msg);
     const { email } = req.body;
     const user = User.findOne({ email: email });
     if (!user) throw new Error("not registered");

@@ -4,7 +4,6 @@ import patientController from "../controllers/patientController.js"
 import doctorController from "../controllers/doctorController.js"
 import reviewController from "../controllers/reviewController.js"
 import { check } from "express-validator";
-import { oneOf } from "express-validator";
 import auth from "../middleware/auth.js";
 const router = express.Router();
 
@@ -12,36 +11,45 @@ router.get("/", (req, res) => {
   res.status(200).send("API Running")
 })
 // get users, register, login and verifyAccount routs
-router.route("/users").get(userController.getUsersList);
-router
-  .route("/users/register")
-  .post(
-    [
+router.route("/users").get(auth, userController.getUsersList);
+router.route("/users/register").post([
       check("email").exists(),
-      check("password").exists(),
-      check("confirmPassword").exists(),
       check("email", "email required").notEmpty(),
-      check("password", "password required").notEmpty(),
-      check("confirmPassword", "confirmPassword required").notEmpty(),
       check("email", "Invalid email").isEmail(),
-    ],
+      check("password").exists(),
+      check("password", "password required").notEmpty(),
+      check("confirmPassword").exists(),
+      check("confirmPassword", "confirmPassword required").notEmpty(),],
     userController.register
   );
-router
-  .route("/users/login")
-  .post(
+router.route("/users/login").post(
     [
-      check("email").exists(),
-      check("password").exists(),
+      check("email", "empty filed").exists(),
       check("email", "email required").notEmpty(),
-      check("password", "password required").notEmpty(),
       check("email", "Invalid email").isEmail(),
+      check("password", "empty password").exists(),
+      check("password", "password required").notEmpty(),
     ],
     userController.login
   );
 router.route("/users/verifyAccount").patch(userController.verifyAccount)
-router.route("/users/changePassword").patch(auth, userController.changePassword);
-router.route("/users/forgotPassword").get([check("email", "Should be an Email").isEmail()],userController.forgotPassword);
+router.route("/users/changePassword").patch(auth,[
+      check("oldPassword", "empty filed").exists(),
+      check("oldPassword").notEmpty(),
+      check("newPassword", "empty filed").exists(),
+      check("newPassword").notEmpty(),
+      check("confirmPassword", "empty filed").exists(),
+      check("confirmPassword").notEmpty(),
+    ],
+    userController.changePassword
+  );
+router
+  .route("/users/forgotPassword")
+  .get(
+    [check("email", "empty filed").exists()],
+    check("email", "Invalid email").isEmail(),
+    userController.forgotPassword
+  );
 // doctors
 
 

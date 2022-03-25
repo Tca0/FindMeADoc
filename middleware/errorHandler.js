@@ -1,8 +1,11 @@
 export default function errorHandler(err, req, res, next) {
   console.log("error", err.message);
-  if (err.message === "empty DB") {
-    return res.status(404).json({ message: "No users registered" });
+  if (err.message === "no-authentication") {
+    return res.status(401).json({message: "request is unauthorized"})
   }
+    if (err.message === "empty DB") {
+      return res.status(404).json({ message: "No users registered" });
+    }
   if (err.message === "not active") {
     return res.status(400).json({ message: "Activate your account please."})
   }
@@ -33,7 +36,7 @@ export default function errorHandler(err, req, res, next) {
   if (err.message === "Not active") {
     return res.status(400).json({message: "Please verify your account to login, an email sent to you with verification code"})
   }
-  if (err.message === "email required") {
+  if (err.message === "email required" || err.message === "empty filed") {
     return res.status(400).json({ message: "please enter your email address" });
   }
   if (err.message === "Invalid value") {
@@ -43,8 +46,8 @@ export default function errorHandler(err, req, res, next) {
         message: "empty fields, please complete your registration form",
       });
   }
-  if(err.message === "password required") {
-    return res.status(400).json({message: "please enter your password"})
+  if (err.message === "password required" || err.message === "empty password") {
+    return res.status(400).json({ message: "please enter your password" });
   }
   if (err.message === "confirmPassword required") {
     return res.status(400).json({ message: "please confirm your password" });
