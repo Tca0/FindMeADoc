@@ -172,20 +172,47 @@ async function forgotPassword(req, res, next) {
     console.log(errors.errors);
     if (errors.errors.length !== 0) throw new Error(errors.errors[0].msg);
     const { email } = req.body;
-    const user = User.findOne({ email: email });
+    const user = await User.findOne({ email: email });
     if (!user) throw new Error("not registered");
     const code = Math.floor(100000 + Math.random() * 900000);
+    // code will expire after 15 mins
+    const expiry = Date.now() + 60 * 1000 * 15;
+    //generating token to be sent as alink
+    const payload = {
+      userId: user._id,
+      role: user.role,
+      code: code
+    };
+    const token = jwt.sign(payload, process.env.JWT_SECRET);
     //trying to store the value of sending male value in a variable but undefined
-    const info = await mailer.sendResetPasswordEmail(email, code);
-    if(info.err) throw new Error("reset link failed")
-    res.status(200).json({ message: "check your email please", code})
+    const info = await mailer.sendResetPasswordEmail(email, token);
+    if (info.err) {throw new Error("reset link failed");}
+    console.log(user.resetPasswordToken, user.resetPasswordExpires);
+    user.resetPasswordToken = token;
+    user.resetPasswordExpires = expiry;
+    console.log("before updating",user.resetPasswordToken, user.resetPasswordExpires);
+    const passwordToReset = await User.findOneAndUpdate(
+      {
+        email: email,
+      },
+      {
+        resetPasswordToken: token,
+        resetPasswordExpires: expiry,
+      },
+      {new: true}
+    );
+    console.log(passwordToReset)
+    res.status(200).json({ message: "check your email please", token });
   } catch (err) {
     next(err);
   }
 }
 async function resetPassword(req, res, next){
   const { code, newPassword, confirmPassword } = req.body
-  const { currentUser } = req
+  const { token } = req.params
+  // console.log(token)
+  const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+  // console.log(decodedToken)
   const errors = validationResult(req);
   try{
     if (errors.errors.length !== 0) throw new Error(errors.errors[0].msg);
@@ -193,7 +220,10 @@ async function resetPassword(req, res, next){
     // all steps that use code to reset and verify will change by converting codes to tokens
     const isItMatch = passwordsFunctions.confirmPassword(newPassword, confirmPassword)
     if(!isItMatch) throw new Error("password not confirmed");
-    const user = await User.findOne({email: currentUser.email})
+    const user = await User.findById(decodedToken.userId);
+    //check if token not expired
+    // convert new password to hashed password
+    // update document and save then return response.
     console.log(user)
     if(!user) throw new Error("no-authentication");
     const newUser = await User.findOneAndUpdate(

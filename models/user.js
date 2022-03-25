@@ -18,6 +18,8 @@ const userSchema = new mongoose.Schema({
   active: { type: Boolean, default: 0 },
   completed: { type: Boolean, default: 0 },
   activationCode: { type: String, default: null },
+  resetPasswordToken: { type: String, default: null },
+  resetPasswordExpires: { type: Date, default: null },
 });
 
 export default mongoose.model("User", userSchema);

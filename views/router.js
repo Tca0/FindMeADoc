@@ -35,8 +35,7 @@ router.route("/users/login").post(
     userController.login
   );
 router.route("/users/verifyAccount").patch(userController.verifyAccount);
-router.route("/users/:userId/changePassword").patch(
-    auth,
+router.route("/users/:userId/changePassword").patch(auth,
     [
       check("oldPassword", "empty filed").exists(),
       check("oldPassword").notEmpty(),
@@ -47,9 +46,7 @@ router.route("/users/:userId/changePassword").patch(
     ],
     userController.changePassword
   );
-router
-  .route("/users/forgotPassword")
-  .get(
+router.route("/users/forgotPassword").put(
     [
       check("email", "empty filed").exists(),
       check("email", "Invalid email").isEmail(),
@@ -57,9 +54,8 @@ router
     userController.forgotPassword
   );
 router
-  .route("/users/resetPassword")
+  .route("/users/resetPassword/:token")
   .patch(
-    auth,
     [
       check("newPassword").exists(),
       check("newPassword").notEmpty(),
