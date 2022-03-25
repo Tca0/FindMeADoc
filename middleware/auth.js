@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import User from "../models/user.js";
-
+import Patient from "../models/patient.js"
+import patient from "../models/patient.js";
 export default async function auth(req, res, next) {
   const rawToken = req.headers.authorization;
   try {
@@ -14,10 +15,12 @@ export default async function auth(req, res, next) {
     }
     const token = rawToken.split(" ")[1].trim();
     const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findOne({ email: decodedToken.email });
+    let user = await User.findOne({ email: decodedToken.email });
     if (!user) throw new Error("Not registered");
-    req.currentUser = user;
-    console.log("from middleware", req.currentUser)
+    console.log("decoded token", decodedToken)
+    req.currentUser = decodedToken
+    // req.currentUser = decodedToken
+    // console.log(req.currentUser)
     next();
   } catch (e) {
     console.log(e.message);

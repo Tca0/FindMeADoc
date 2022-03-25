@@ -69,7 +69,6 @@ async function register(req, res, next) {
     next(err);
   }
 }
-
 //login process and generating a token
 async function login(req, res, next) {
   try {
@@ -86,15 +85,22 @@ async function login(req, res, next) {
       user.password,
       req.body.password
     );
-    console.log("user controller", isItMatch);
+    let payload = {
+    };
     if (!isItMatch) throw new Error("invalid login");
-
-    //creating a variable to cary logged in user (necessary info for user)
-    const payload = {
+    if(user.role === "patient") {
+      const patient = await Patient.findOne(({email: user.email}))
+      payload = {
       userId: user._id,
       email: user.email,
+      password: user.password,
       role: user.role,
-    };
+      patientID: patient._id,
+      name: patient.fullName
+      }
+    }
+    //creating a variable to cary logged in user (necessary info for user)
+    console.log(payload)
     const token = jwt.sign(payload, process.env.JWT_SECRET);
     res.status(200).json({ payload, token });
   } catch (err) {
@@ -133,6 +139,7 @@ async function changePassword(req, res, next) {
   //if it's then will set the new password after hashing it.
   const { oldPassword, newPassword, confirmPassword } = req.body;
   const errors = validationResult(req);
+  // console.log(req.currentUser)
   try {
     if (errors.errors.length !== 0) throw new Error(errors.errors[0].msg);
     const isItMatch = await passwordsFunctions.comparePassword(
