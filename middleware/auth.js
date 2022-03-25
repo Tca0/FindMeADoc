@@ -15,7 +15,7 @@ export default async function auth(req, res, next) {
     const token = rawToken.split(" ")[1].trim();
     //   console.log(token)
     const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findOne({ userName: decodedToken.userName });
+    const user = await User.findOne({ email: decodedToken.email });
     if (!user) throw new Error("Not registered");
     req.currentUser = user;
     next();

@@ -20,6 +20,7 @@ router.route("/users/changePassword").patch(auth, userController.changePassword)
 // doctors
 router
   .route("/patients")
+  //should not be visible to viewers
   .get(patientController.findPatients)
   .post(patientController.createPatient);
 

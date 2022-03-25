@@ -72,7 +72,7 @@ async function removeDoctor(req, res, next) {
 // search doctors based on postcode: for substring search, case insensitive
 async function searchByPostcode(req, res) {
   try {
-    const postcodeAsQuery = req.body.postcode;
+    const postcodeAsQuery = req.query.postcode;
     console.log(postcodeAsQuery);
     const matchingDoctor = await Doctor.find({
       "address.postcode": new RegExp(postcodeAsQuery, "i"),
