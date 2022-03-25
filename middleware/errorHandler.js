@@ -1,5 +1,5 @@
 export default function errorHandler(err, req, res, next) {
-  console.log("error", err.message);
+  // console.log("error", err.message);
   if (err.message === "no-authentication") {
     return res.status(401).json({message: "request is unauthorized"})
   }
@@ -19,7 +19,7 @@ export default function errorHandler(err, req, res, next) {
     return res.status(405).json({ message: "please use a valid email format" });
   }
   if(err.message === "password not confirmed") {
-    return res.status(404).json({ message: "passwords doesn't match" })
+    return res.status(404).json({ message: "password and confirmed password don't match" })
   }
   if(err.message === "invalid login") {
     res.status(404).json({ message: "invalid login information"})
@@ -51,6 +51,12 @@ export default function errorHandler(err, req, res, next) {
   }
   if (err.message === "confirmPassword required") {
     return res.status(400).json({ message: "please confirm your password" });
+  }
+  if (err.message === "verification email failed") {
+    res.status(500).json({message: "couldn't verify email/send verification email, please try register with a valid email."})
+  }
+  if (err.message === "reset link failed") {
+    res.status(500).json({message : "couldn't sent reset password link please try again later"})
   }
     //default error
     res.sendStatus(500);

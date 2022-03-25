@@ -1,12 +1,9 @@
-// import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import User from "../models/user.js";
 import Patient from "../models/patient.js";
 import Doctor from "../models/doctor.js";
 import { validationResult } from "express-validator";
 import passwordsFunctions from "../db/helpers/passwordsFunctions.js";
-import sendConfirmationEmail from "../db/helpers/mailer.js";
-// import sendResetPasswordEmail from "../db/helpers/mailer.js";
 import mailer from "../db/helpers/mailer.js"
 // get all users
 async function getUsersList(req, res, next) {
@@ -24,23 +21,14 @@ async function getUsersList(req, res, next) {
 async function register(req, res, next) {
   try {
     const errors = validationResult(req);
-    // console.log("first",errors)
-    console.log("second",errors.errors);
-    console.log("nestedErrors", errors.errors[0].msg)
-    if(errors.errors[0].msg) throw new Error(errors.errors[0].msg);
+    if (errors.errors.length !== 0) throw new Error(errors.errors[0].msg);
     //exists function return objectId if user existed otherwise will return a null
     const existedUser = await User.exists({ email: req.body.email });
     //if user is registered but the account was deleted which means the account is unavailable more
     // then they need to re-activate their accounts again
-
     if (existedUser && existedUser.active === 0) throw new Error("not active");
     if (existedUser) throw new Error("user existed");
-    if (
-      !passwordsFunctions.confirmPassword(
-        req.body.password,
-        req.body.confirmPassword
-      )
-    ) {
+    if (!passwordsFunctions.confirmPassword(  req.body.password,  req.body.confirmPassword)) {
       throw new Error("password not confirmed");
     }
     const newUser = {
@@ -48,41 +36,35 @@ async function register(req, res, next) {
       password: req.body.password,
       role: req.body.role,
     };
-    console.log(newUser);
     //hashing password
-
-    // const salt = await bcrypt.genSalt(8);
-    // const hashedPassword = await bcrypt.hash(newUser.password, salt);
     const password = await passwordsFunctions.hashPassword(newUser.password);
     const code = Math.floor(100000 + Math.random() * 900000); //Generate random 6 digit code.
+    //try to send email for user
+    // if succeed creat user other wise ask them to register with real email address
+    const info = await mailer.sendConfirmationEmail(newUser.email, code);
+    if(info.err) throw new Error("verification email failed")
     const createdUser = await User.create({
       ...newUser,
       password: password,
       activationCode: code,
       //active account will be after verification process
     });
-    console.log(createdUser.role);
     //According to the role add user to the right schema
     if (createdUser.role === "patient") {
       const newPatient = await Patient.create({
         email: createdUser.email,
-        //active account will be after verification process
       });
     }
     if (createdUser.role === "doctor") {
       const newDoctor = await Doctor.create({
         email: createdUser.email,
-        //active account will be after verification process
+        
       });
     }
-    //call send email function
-    console.log("calling send mail function");
-    await sendConfirmationEmail(createdUser.email, code);
     res.status(200).json({
       message: "registration successful, verify your account using code",
       code,
     });
-    console.log(createdUser);
   } catch (err) {
     next(err);
   }
@@ -145,13 +127,11 @@ async function verifyAccount(req, res, next) {
 }
 async function changePassword(req, res, next) {
   // current user will give access to user schema
-  console.log(req.currentUser);
   //req body has new password and confirm new password
   // first this function will match the old password with the old one that stored
   // if it's match then it will check if new password and confirmPassword match
   //if it's then will set the new password after hashing it.
   const { oldPassword, newPassword, confirmPassword } = req.body;
-  console.log(req.body.currentUser);
   const errors = validationResult(req);
   try {
     if (errors.errors.length !== 0) throw new Error(errors.errors[0].msg);
@@ -185,10 +165,34 @@ async function forgotPassword(req, res, next) {
     if (!user) throw new Error("not registered");
     const code = Math.floor(100000 + Math.random() * 900000);
     //trying to store the value of sending male value in a variable but undefined
-    await mailer.sendResetPasswordEmail(email, code);
+    const info = await mailer.sendResetPasswordEmail(email, code);
+    if(info.err) throw new Error("reset link failed")
     res.status(200).json({ message: "check your email please", code})
   } catch (err) {
     next(err);
+  }
+}
+async function resetPassword(req, res, next){
+  const { code, newPassword, confirmPassword } = req.body
+  const { currentUser } = req
+  const errors = validationResult(req);
+  try{
+    if (errors.errors.length !== 0) throw new Error(errors.errors[0].msg);
+    //test if code is valid
+    // all steps that use code to reset and verify will change by converting codes to tokens
+    const isItMatch = passwordsFunctions.confirmPassword(newPassword, confirmPassword)
+    if(!isItMatch) throw new Error("password not confirmed");
+    const user = await User.findOne({email: currentUser.email})
+    console.log(user)
+    if(!user) throw new Error("no-authentication");
+    const newUser = await User.findOneAndUpdate(
+      { email: currentUser.email },
+      { password: newPassword },
+      { new: true }
+    );
+    res.status(200).json({message: "password has been reset, login again"})
+  } catch(err){
+    next(err)
   }
 }
 export default {
@@ -199,4 +203,5 @@ export default {
   verifyAccount,
   changePassword,
   forgotPassword,
+  resetPassword
 };

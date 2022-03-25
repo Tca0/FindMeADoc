@@ -13,13 +13,8 @@ const transport = nodemailer.createTransport({
   },
 });
 async function sendConfirmationEmail(toAddress, code) {
-  console.log(`trying to sent email to ${toAddress} with code ${code}`);
-  console.log(transport)
   try {
-    console.log("sending email to user")
-    console.log(process.env.EMAIL, process.env.PASSWORD);
-    console.log(process.env.CLIENT_ID, process.env.CLIENT_SECRET);
-    await transport.sendMail({
+    const info = await transport.sendMail({
       from: process.env.EMAIL,
       to: toAddress,
       subject: "confirmation email",
@@ -30,15 +25,18 @@ async function sendConfirmationEmail(toAddress, code) {
         <a href=http://localhost:4000/confirm/${code}> Click here</a>
         </div>`,
     });
-  }
-  catch(err) {
-    console.log(err)
+    return { err: false };
+  } catch(err) {
+    console.error("send-email-error", error);
+    return {
+      err: true,
+      message: "Cannot send email",
+    };
   }
 }
 async function sendResetPasswordEmail(toAddress, code){
   try{
-    console.log("sending reset password code to:", toAddress)
-    transport.sendMail({
+    const info = transport.sendMail({
       from: process.env.EMAIL,
       to: toAddress,
       subject: "Reset Password Request",
@@ -49,9 +47,13 @@ async function sendResetPasswordEmail(toAddress, code){
         <a href=http://localhost:4000/confirm/${code}> Click here</a>
         </div>`,
     });
+    return { err: false }
   } catch(err){
-    console.log("email not send")
-    console.log(err)
+    console.error("send-email-error", error);
+    return {
+      err: true,
+      message: "Cannot send email",
+    };
   }
 }
 export default {
