@@ -138,10 +138,14 @@ async function changePassword(req, res, next) {
   // if it's match then it will check if new password and confirmPassword match
   //if it's then will set the new password after hashing it.
   const { oldPassword, newPassword, confirmPassword } = req.body;
+  const { userId } = req.params
+  const {currentUser} = req
   const errors = validationResult(req);
   // console.log(req.currentUser)
   try {
+    console.log(currentUser);
     if (errors.errors.length !== 0) throw new Error(errors.errors[0].msg);
+    if(userId !== currentUser.userId) throw new Error("no-authentication");
     const isItMatch = await passwordsFunctions.comparePassword(
       req.currentUser.password,
       oldPassword

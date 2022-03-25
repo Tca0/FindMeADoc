@@ -12,9 +12,7 @@ router.get("/", (req, res) => {
 });
 // get users, register, login and verifyAccount routs
 router.route("/users").get(auth, userController.getUsersList);
-router
-  .route("/users/register")
-  .post(
+router.route("/users/register").post(
     [
       check("email").exists(),
       check("email", "email required").notEmpty(),
@@ -26,9 +24,7 @@ router
     ],
     userController.register
   );
-router
-  .route("/users/login")
-  .post(
+router.route("/users/login").post(
     [
       check("email", "empty filed").exists(),
       check("email", "email required").notEmpty(),
@@ -39,9 +35,7 @@ router
     userController.login
   );
 router.route("/users/verifyAccount").patch(userController.verifyAccount);
-router
-  .route("/users/changePassword")
-  .patch(
+router.route("/users/:userId/changePassword").patch(
     auth,
     [
       check("oldPassword", "empty filed").exists(),
