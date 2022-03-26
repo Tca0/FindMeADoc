@@ -4,8 +4,8 @@ export async function connectToDb() {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   };
-  const connectToDb = process.env.CONNECTION_STRING
-    ? process.env.CONNECTION_STRING
+  const connectToDb = process.env.MONGODB_URL
+    ? process.env.MONGODB_URL
     : "mongodb://127.0.0.1:27017/findMeADoc";
   return mongoose.connect(connectToDb, opts);
   //   return mongoose.connect("mongodb://127.0.0.1:27017/findADoc", opts);

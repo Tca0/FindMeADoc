@@ -4,6 +4,7 @@
   "description": "Group project by Julie, Taher and Zan using MERN stack",
   "main": "index.js",
   "scripts": {
+    "start":"node server.js",
     "dev": "npx nodemon server.js",
     "seed": "node db/seed.js",
     "test": "node --experimental-vm-modules --no-warnings  node_modules/.bin/jest -i --verbose --watch"

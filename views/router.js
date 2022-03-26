@@ -13,7 +13,9 @@ router.get("/", (req, res) => {
 // get users, register, login and verifyAccount routs
 
 router.route("/users").get(auth, userController.getUsersList);
-router.route("/users/register").post(
+router
+  .route("/users/register")
+  .post(
     [
       check("email").exists(),
       check("email", "email required").notEmpty(),
@@ -25,7 +27,9 @@ router.route("/users/register").post(
     ],
     userController.register
   );
-router.route("/users/login").post(
+router
+  .route("/users/login")
+  .post(
     [
       check("email", "empty filed").exists(),
       check("email", "email required").notEmpty(),
@@ -47,7 +51,9 @@ router.route("/users/:userId/changePassword").patch(auth,
     ],
     userController.changePassword
   );
-router.route("/users/forgotPassword").put(
+router
+  .route("/users/forgotPassword")
+  .put(
     [
       check("email", "empty filed").exists(),
       check("email", "Invalid email").isEmail(),
@@ -97,7 +103,7 @@ router
 router.route("/doctor/:doctorID/reviews").post(
       auth,
   [
-    check("comments", "Comments are missing").notEmpty(),
+    check("comment", "Comments are missing").notEmpty(),
     check("rate", "Please provide rating").notEmpty(),
     check("rate", "Has to be an integer").isInt(),
   ],
