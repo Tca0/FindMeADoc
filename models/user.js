@@ -8,7 +8,7 @@ const userSchema = new mongoose.Schema({
     lowercase: true,
     trim: true,
 
-    validate: [isEmail, "invalid email"],
+    // validate: [isEmail, "invalid email"],
   },
   password: { type: String, required: true },
   role: {
@@ -23,3 +23,4 @@ const userSchema = new mongoose.Schema({
 });
 
 export default mongoose.model("User", userSchema);
+"2000-01-01"

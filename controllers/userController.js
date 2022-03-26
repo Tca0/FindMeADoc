@@ -78,18 +78,6 @@ async function register(req, res, next) {
     next(err);
   }
 }
-//verify account with code 
-async function verifyAccount(req, res, next) {
-  console.log(req.body.code)
-  try{
-    //check user id is right
-    //should invitation link has user id
-    // check valid key
-    //if it's right activate and reset code to null
-  } catch(err) {
-
-  }
-}
 //login process and generating a token
 async function login(req, res, next) {
   try {
@@ -98,7 +86,7 @@ async function login(req, res, next) {
     console.log(errors.errors);
     if (errors.errors.length !== 0) throw new Error("invalid email format");
     const user = await User.findOne({ email: req.body.email });
-    // console.log(user);
+    console.log(user);
     if (!user) throw new Error("invalid login");
     //it will compare the entered password with the hashed one(remember that)
 
@@ -130,6 +118,7 @@ async function login(req, res, next) {
 }
 //when users complete their profiles then account will assigned as completed
 async function verifyAccount(req, res, next) {
+  console.log("route got hi")
   const { email, code } = req.body;
   console.log(email, code);
   //user will attach the code with their email then we check if match then user account will be activated
