@@ -82,8 +82,8 @@ router
 router
   .route("/patients/:patientID")
   .get(auth, patientController.showPatient)
-  .put(auth,patientController.updatePatient)
-  .delete(auth,patientController.removePatient);
+  .put(auth, patientController.updatePatient)
+  .delete(auth, patientController.removePatient);
 
 router
   .route("/doctors")
@@ -96,24 +96,30 @@ router.route("/doctors/search").get(doctorController.searchDoctors);
 router
   .route("/doctor/:doctorID")
   .get(doctorController.showDoctor)
-  .put(auth,doctorController.updateDoctor)
-  .delete(auth,doctorController.removeDoctor);
+  .put(auth, doctorController.updateDoctor)
+  .delete(auth, doctorController.removeDoctor);
 
 // doctor reviews
-router.route("/doctor/:doctorID/reviews").post(
-      auth,
-  [
-    check("comment", "Comments are missing").notEmpty(),
-    check("rate", "Please provide rating").notEmpty(),
-    check("rate", "Has to be an integer").isInt(),
-  ],
-  reviewController.create
-);
+router
+  .route("/doctor/:doctorID/reviews")
+  .post(
+    auth,
+    [
+      check("comment", "Comments are missing").notEmpty(),
+      check("rate", "Please provide rating").notEmpty(),
+      check("rate", "Has to be an integer").isInt(),
+    ],
+    reviewController.create
+  );
 
-//!add auth
+// add validation if
 router
   .route("/doctor/:doctorID/review/:reviewID")
-  .put(reviewController.update)
-  .delete(reviewController.remove);
+  .put(
+    auth,
+    [check("rate", "Has to be an integer").isInt()],
+    reviewController.update
+  )
+  .delete(auth, reviewController.remove);
 
 export default router;
