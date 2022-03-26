@@ -9,7 +9,7 @@ async function findPatients(req,res,next){
         res.send({message:"There was a problem finding patients"})
     }
 }
-//will not be used once registration is implemented
+
 async function createPatient(req,res,next){
     console.log("incoming")
     const newPatient = req.body
@@ -38,7 +38,6 @@ async function showPatient(req,res,next){
     }
 }
 
-//!add auth to check if it current user is the same as the one found
 async function updatePatient(req,res,next){
     const id = req.params.patientID
     const patientUpdate = req.body

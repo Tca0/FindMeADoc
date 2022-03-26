@@ -97,7 +97,7 @@ router
 router.route("/doctor/:doctorID/reviews").post(
       auth,
   [
-    check("comments", "Comments are missing").notEmpty(),
+    check("comment", "Comments are missing").notEmpty(),
     check("rate", "Please provide rating").notEmpty(),
     check("rate", "Has to be an integer").isInt(),
   ],

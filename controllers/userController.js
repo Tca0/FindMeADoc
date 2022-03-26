@@ -191,6 +191,7 @@ async function forgotPassword(req, res, next) {
       role: user.role,
       code: code
     };
+    console.log(payload,"payload")
     const token = jwt.sign(payload, process.env.JWT_SECRET);
     //trying to store the value of sending male value in a variable but undefined
     const info = await mailer.sendResetPasswordEmail(email, token);
