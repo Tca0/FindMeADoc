@@ -68,6 +68,7 @@ router
 
 router
   .route("/patients")
+  //should not be visible to viewers
   .get(patientController.findPatients)
   .post(patientController.createPatient);
 
@@ -84,6 +85,8 @@ router
   .get(doctorController.findDoctors)
   .post(doctorController.createDoctor);
 
+//find doctor(s)
+router.route("/doctor").get(doctorController.searchByPostcode);
 router
   .route("/doctor/:doctorID")
   .get(doctorController.showDoctor)

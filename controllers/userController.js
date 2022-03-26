@@ -77,7 +77,7 @@ async function login(req, res, next) {
     console.log(errors.errors);
     if (errors.errors.length !== 0) throw new Error(errors.errors[0].msg);
     const user = await User.findOne({ email: req.body.email });
-    // console.log(user);
+    console.log(user);
     if (!user) throw new Error("invalid login");
     if (!user.active) throw new Error("Not active");
     //it will compare the entered password with the hashed one(remember that)
@@ -109,6 +109,7 @@ async function login(req, res, next) {
 }
 //when users complete their profiles then account will assigned as completed
 async function verifyAccount(req, res, next) {
+  console.log("route got hi")
   const { email, code } = req.body;
   console.log(email, code);
   //user will attach the code with their email then we check if match then user account will be activated
