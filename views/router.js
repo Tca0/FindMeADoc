@@ -74,11 +74,9 @@ router
 
 router
   .route("/patients/:patientID")
-  .get(patientController.showPatient)
-  //! add auth
-  .put(patientController.updatePatient)
-  //! add auth
-  .delete(patientController.removePatient);
+  .get(auth, patientController.showPatient)
+  .put(auth,patientController.updatePatient)
+  .delete(auth,patientController.removePatient);
 
 router
   .route("/doctors")
@@ -90,19 +88,17 @@ router.route("/doctor").get(doctorController.searchByPostcode);
 router
   .route("/doctor/:doctorID")
   .get(doctorController.showDoctor)
-  //! add auth
-  .put(doctorController.updateDoctor)
-  //! add auth
-  .delete(doctorController.removeDoctor);
+  .put(auth,doctorController.updateDoctor)
+  .delete(auth,doctorController.removeDoctor);
 
 // doctor reviews
 router.route("/doctor/:doctorID/reviews").post(
-  //     auth,
-  // [
-  //   check("comments", "Comments are missing").notEmpty(),
-  //   check("rating", "Please provide rating").notEmpty(),
-  //   check("rating", "Has to be an integer").isInt(),
-  // ],
+      auth,
+  [
+    check("comments", "Comments are missing").notEmpty(),
+    check("rate", "Please provide rating").notEmpty(),
+    check("rate", "Has to be an integer").isInt(),
+  ],
   reviewController.create
 );
 

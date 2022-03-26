@@ -48,6 +48,8 @@ async function updateDoctor(req, res, next) {
     const updatedDoctor = await Doctor.findOne({ _id: id });
 
     if (!updatedDoctor) return res.json({ message: "Doctor not found by ID" });
+    if(req.currentUser.role==="patient") return res.json({message: "Patients cannot edit doctor profiles"})
+    if(req.currentUser.doctorID !== id) return res.json({message: `Unauthorized: You do not have permission to edit this profile`})
 
     updatedDoctor.set(doctorUpdate);
     await updatedDoctor.save();
@@ -61,12 +63,19 @@ async function updateDoctor(req, res, next) {
 //!add auth to check if it current user is the same as the one found
 async function removeDoctor(req, res, next) {
   const id = req.params.doctorID;
-  const deletedDoctor = await Doctor.findByIdAndDelete(id);
+  try{
+    if(req.currentUser.role==="patient") return res.json({message: "Patients cannot remove Doctor profiles"})
+    if(req.currentUser.doctorID !== id) return res.json({message: `Unauthorized: You do not have permission to remove this profile`})
+    const deletedDoctor = await Doctor.findByIdAndDelete(id);
+  
+    console.log(deletedDoctor);
+  
+    if (!deletedDoctor) return res.json({ message: "doctor not found" });
+    res.sendStatus(204);
 
-  console.log(deletedDoctor);
-
-  if (!deletedDoctor) return res.json({ message: "doctor not found" });
-  res.sendStatus(204);
+  }catch(e){
+    next(e)
+  }
 }
 
 // search doctors based on postcode: for substring search, case insensitive

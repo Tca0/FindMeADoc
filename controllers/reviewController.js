@@ -2,15 +2,16 @@ import { validationResult } from "express-validator";
 import Doctor from "../models/doctor.js"
 
 async function create(req, res, next){
-    // const errors = validationResult(req)
-    // console.log(errors)
-    // console.log(Object.keys(errors))
-    // console.log("Number of errors", errors.errors.length)
-    // if (!errors.isEmpty()) {
-    //     return res.status(400).json({ errors: errors.array() })
-    // }
+    const errors = validationResult(req)
+    console.log(errors)
+    console.log(Object.keys(errors))
+    console.log("Number of errors", errors.errors.length)
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() })
+    }
     const {body: newReview} = req
     const doctorID = req.params.doctorID
+    newReview.user = req.currentUser.patientID
     try{
         const reviewsOnDoctor = await Doctor.findById(doctorID)
 
