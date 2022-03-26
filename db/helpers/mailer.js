@@ -1,4 +1,3 @@
-// const nodemailer = require("nodemailer");
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 
@@ -22,7 +21,7 @@ async function sendConfirmationEmail(toAddress, code) {
         <h2>Hello</h2>
         <p>Thank you for subscribing. Please confirm your email by clicking on the following link</p>
         // should be linked to the front end
-        <a href=http://localhost:4000/confirm/${code}> Click here</a>
+        <a href=http://localhost:4000/confirm/${code}/account> Click here</a>
         </div>`,
     });
     return { err: false };
@@ -44,7 +43,7 @@ async function sendResetPasswordEmail(toAddress, code){
         <h2>Hello</h2>
         <p>click on the link to reset your password ${code}</p>
         // should be linked to the front end
-        <a href=http://localhost:4000/confirm/${code}> Click here</a>
+        <a href=http://localhost:4000/resetPassword/${code}> Click here</a>
         </div>`,
     });
     return { err: false }

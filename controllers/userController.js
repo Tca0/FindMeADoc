@@ -18,6 +18,7 @@ async function getUsersList(req, res, next) {
     next(err);
   }
 }
+//register new account send email with link to confirm the registration and activate the account.
 async function register(req, res, next) {
   try {
     const errors = validationResult(req);
@@ -26,8 +27,7 @@ async function register(req, res, next) {
     const existedUser = await User.exists({ email: req.body.email });
     //if user is registered but the account was deleted which means the account is unavailable more
     // then they need to re-activate their accounts again
-
-    if (existedUser && existedUser.active === 0) throw new Error("not active");
+    if (existedUser && !existedUser.active) throw new Error("not active");
     if (existedUser) throw new Error("user existed");
     if (
       !passwordsFunctions.confirmPassword(
@@ -40,21 +40,37 @@ async function register(req, res, next) {
     const newUser = {
       email: req.body.email,
       password: req.body.password,
-      role: req.body.role,
     };
+    console.log(newUser);
     //hashing password
-    const password = await passwordsFunctions.hashPassword(newUser.password);
+    const hashedPassword = await passwordsFunctions.hashPassword(
+      newUser.password
+    );
+    console.log(hashedPassword);
     const code = Math.floor(100000 + Math.random() * 900000); //Generate random 6 digit code.
+    const expiry = Date.now() + 60 * 1000 * 15; // expire after 15 mins
     //try to send email for user
     // if succeed creat user other wise ask them to register with real email address
+    console.log(code, expiry);
     const info = await mailer.sendConfirmationEmail(newUser.email, code);
     if (info.err) throw new Error("verification email failed");
     const createdUser = await User.create({
       ...newUser,
-      password: password,
-      activationCode: code,
+      password: hashedPassword,
+      verifyCode: code,
+      verifyAccountExpires: expiry,
       //active account will be after verification process
     });
+    const payload = {
+      userId: createdUser._id,
+      email: createdUser.email,
+      role: createdUser.role,
+      code: code,
+    };
+    console.log("payload",payload);
+    const token = jwt.sign(payload, process.env.JWT_SECRET);
+    const info = await mailer.sendConfirmationEmail(newUser.email, token);
+    if (info.err) throw new Error("verification email failed");
     //According to the role add user to the right schema
     if (createdUser.role === "patient") {
       const newPatient = await Patient.create({
@@ -69,6 +85,7 @@ async function register(req, res, next) {
     res.status(200).json({
       message: "registration successful, verify your account using code",
       code,
+      token,
     });
   } catch (err) {
     next(err);
@@ -122,9 +139,8 @@ async function login(req, res, next) {
     }else if(user.role === "doctor"){
       const doctor = await Doctor.findOne(({email: user.email}))
 
-      payload.doctorID = doctor._id,
-      payload.name = doctor.fullName
-  }
+      (payload.doctorID = doctor._id), (payload.name = doctor.fullName);
+    }
     //creating a variable to cary logged in user (necessary info for user)
     console.log(payload);
     const token = jwt.sign(payload, process.env.JWT_SECRET);
@@ -133,23 +149,52 @@ async function login(req, res, next) {
     next(err);
   }
 }
-//when users complete their profiles then account will assigned as completed
+//verify account will check if the correct user is requesting the confirmation process
+//if the link expired it will send new activation link to the user.
 async function verifyAccount(req, res, next) {
-  console.log("route got hi");
-  const { email, code } = req.body;
-  console.log(email, code);
+  const { token } = req.params;
+  console.log("token", token);
   //user will attach the code with their email then we check if match then user account will be activated
   try {
+    //decode token and search for user
+    //if user existed and token not expired activate account
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    console.log("decodedToken", decodedToken);
     const user = await User.findOne({
-      email: email,
+      _id: decodedToken.userId,
     });
-    console.log(user);
-    // console.log(user.activationCode);
-    if (!user || user.activationCode !== code)
-      throw new Error("invalid activation");
-    //user existed and code is right ==> we need to set account as active and save data
-    user.activationCode = null;
+    console.log("user", user);
+    if (!user) throw new Error("user not found");
+    if(user.active) throw new Error("account already activated, please login to your account")
+    console.log(user.verifyCode, typeof user.verifyCode);
+    console.log(decodedToken.code, typeof `${decodedToken.code}`);
+    if (user.verifyCode !== `${decodedToken.code}`) throw new Error("wrong code");
+    //check if link is expired
+    const expiredLink = await User.findOne({
+      _id: decodedToken.userId,
+      verifyAccountExpires: { $gt: Date.now() },
+    });
+    if (!expiredLink) {
+      const code = Math.floor(100000 + Math.random() * 900000); //Generate random 6 digit code.
+      const expiry = Date.now() + 60 * 1000 * 15; // expire after 15 mins
+      decodedToken.code = code
+      console.log(decodedToken)
+      const newToken = jwt.sign(decodedToken, process.env.JWT_SECRET);
+      console.log(newToken);
+      user.verifyCode = code;
+      user.verifyAccountExpires = expiry
+      user.save()
+      const info = mailer.sendConfirmationEmail(decodedToken.email, newToken);
+      return res.status(401).json({
+        message:
+          "Activation link has expired, new activation email was sent to you, please check your email",
+        decodedToken,
+        newToken,
+      });
+    }
+    user.verifyAccountExpires = null;
     user.active = 1;
+    user.verifyCode = null;
     await user.save();
     res.status(200).json({
       message: "Account activated, login please to complete your information",
@@ -168,7 +213,6 @@ async function changePassword(req, res, next) {
   const { userId } = req.params;
   const { currentUser } = req;
   const errors = validationResult(req);
-  // console.log(req.currentUser)
   try {
     console.log(currentUser);
     if (errors.errors.length !== 0) throw new Error(errors.errors[0].msg);
@@ -192,8 +236,9 @@ async function changePassword(req, res, next) {
     next(err);
   }
 }
+//forgot password request will send a link to reset password for user if they are existed in DB
+//the link will have all needed info about the account with expiry time
 async function forgotPassword(req, res, next) {
-  console.log(req.body);
   try {
     const errors = validationResult(req);
     console.log(errors.errors);
@@ -218,19 +263,16 @@ async function forgotPassword(req, res, next) {
     if (info.err) {
       throw new Error("reset link failed");
     }
+    //update the requested user with reset password token and expiry time
     console.log(user.resetPasswordToken, user.resetPasswordExpires);
-
-    // user.resetPasswordToken = token;
-    // user.resetPasswordExpires = new Date(expiry)
     console.log("before updating",user.resetPasswordToken, user.resetPasswordExpires);
-
     const passwordToReset = await User.findOneAndUpdate(
       {
         email: email,
       },
       {
         resetPasswordToken: token,
-        resetPasswordExpires: new Date(expiry)
+        resetPasswordExpires: new Date(expiry),
       },
       { new: true }
     );
@@ -240,20 +282,20 @@ async function forgotPassword(req, res, next) {
     next(err);
   }
 }
-
-async function resetPassword(req, res, next){
-  const { newPassword, confirmPassword } = req.body
-  const { token } = req.params
-  // console.log(token)
+async function resetPassword(req, res, next) {
+  const { newPassword, confirmPassword } = req.body;
+  const { token } = req.params;
   const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-  // console.log(decodedToken)
   const errors = validationResult(req);
   try {
     if (errors.errors.length !== 0) throw new Error(errors.errors[0].msg);
     //test if code is valid
     // all steps that use code to reset and verify will change by converting codes to tokens
-    const isItMatch = passwordsFunctions.confirmPassword(newPassword, confirmPassword)
-    if(!isItMatch) throw new Error("password not confirmed");
+    const isItMatch = passwordsFunctions.confirmPassword(
+      newPassword,
+      confirmPassword
+    );
+    if (!isItMatch) throw new Error("password not confirmed");
     const user = await User.findOne({
       _id: decodedToken.userId,
       resetPasswordToken: token,
@@ -261,20 +303,20 @@ async function resetPassword(req, res, next){
     //check if token not expired
     // convert new password to hashed password
     // update document and save then return response.
-    if(!user) throw new Error("no-authentication");
+    if (!user) throw new Error("no-authentication");
     const expiredLink = await User.findOne({
       _id: decodedToken.userId,
       resetPasswordExpires: { $gt: Date.now() },
     });
-    console.log(expiredLink)
-    if(!expiredLink) throw new Error("reset password expired")
+    console.log(expiredLink);
+    if (!expiredLink) throw new Error("reset password expired");
     const hashedPassword = await passwordsFunctions.hashPassword(newPassword);
     const newUser = await User.findOneAndUpdate(
       { _id: decodedToken.userId },
       {
         password: hashedPassword,
         resetPasswordToken: null,
-        resetPasswordExpires: null
+        resetPasswordExpires: null,
       },
       { new: true }
     );

@@ -39,11 +39,8 @@ router
     ],
     userController.login
   );
-router.route("/users/verifyAccount").patch(userController.verifyAccount);
-router
-  .route("/users/:userId/changePassword")
-  .patch(
-    auth,
+router.route("/users/confirm/:token/account").patch(userController.verifyAccount);
+router.route("/users/:userId/changePassword").patch(auth,
     [
       check("oldPassword", "empty filed").exists(),
       check("oldPassword").notEmpty(),

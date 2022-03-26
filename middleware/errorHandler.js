@@ -24,8 +24,8 @@ export default function errorHandler(err, req, res, next) {
   if(err.message === "invalid login") {
     res.status(404).json({ message: "invalid login information"})
   }
-  if(err.message === "invalid activation") {
-    res.status(400).json({ message: "invalid activation code."})
+  if (err.message === "user not found") {
+    res.status(400).json({ message: "Email address not found" });
   }
   if(err.message === "invalid old password") {
     res.status(400).json({message: "old password doesn't match"})
@@ -60,6 +60,9 @@ export default function errorHandler(err, req, res, next) {
   }
   if(err.message === "reset password expired") {
     return res.status(401).json({ message: "link expired, request new link please" });
+  }
+  if (err.message === "wrong code") {
+    return res.status(401).json({ message: "invalid activation code"})
   }
     //default error
     res.sendStatus(500);
