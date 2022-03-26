@@ -191,8 +191,8 @@ async function forgotPassword(req, res, next) {
     const info = await mailer.sendResetPasswordEmail(email, token);
     if (info.err) {throw new Error("reset link failed");}
     console.log(user.resetPasswordToken, user.resetPasswordExpires);
-    user.resetPasswordToken = token;
-    user.resetPasswordExpires = expiry;
+    // user.resetPasswordToken = token;
+    // user.resetPasswordExpires = new Date(expiry)
     console.log("before updating",user.resetPasswordToken, user.resetPasswordExpires);
     const passwordToReset = await User.findOneAndUpdate(
       {
@@ -200,7 +200,7 @@ async function forgotPassword(req, res, next) {
       },
       {
         resetPasswordToken: token,
-        resetPasswordExpires: expiry,
+        resetPasswordExpires: new Date(expiry)
       },
       {new: true}
     );
@@ -211,7 +211,7 @@ async function forgotPassword(req, res, next) {
   }
 }
 async function resetPassword(req, res, next){
-  const { code, newPassword, confirmPassword } = req.body
+  const { newPassword, confirmPassword } = req.body
   const { token } = req.params
   // console.log(token)
   const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
@@ -223,14 +223,23 @@ async function resetPassword(req, res, next){
     // all steps that use code to reset and verify will change by converting codes to tokens
     const isItMatch = passwordsFunctions.confirmPassword(newPassword, confirmPassword)
     if(!isItMatch) throw new Error("password not confirmed");
-    const user = await User.findById(decodedToken.userId);
+    const user = await User.findOne({
+      _id: decodedToken.userId,
+      resetPasswordToken: token,
+    });
     //check if token not expired
     // convert new password to hashed password
     // update document and save then return response.
-    console.log(user)
     if(!user) throw new Error("no-authentication");
+    const expiredLink = await User.findOne({
+      _id: decodedToken.userId,
+      resetPasswordExpires: { $gt: Date.now() },
+    });
+    console.log(expiredLink)
+    if(!expiredLink) throw new Error("reset password expired")
+
     const newUser = await User.findOneAndUpdate(
-      { email: currentUser.email },
+      { _id: decodedToken.userId },
       { password: newPassword },
       { new: true }
     );
