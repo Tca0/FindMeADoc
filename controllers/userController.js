@@ -90,17 +90,22 @@ async function login(req, res, next) {
     let payload = {
     };
     if (!isItMatch) throw new Error("invalid login");
-    if(user.role === "patient") {
-      const patient = await Patient.findOne(({email: user.email}))
-      payload = {
+    payload = {
       userId: user._id,
       email: user.email,
       password: user.password,
       role: user.role,
-      patientID: patient._id,
-      name: patient.fullName
-      }
     }
+    if(user.role === "patient") {
+      const patient = await Patient.findOne(({email: user.email}))
+      payload.patientID = patient._id,
+      payload.name = patient.fullName
+    }else if(user.role === "doctor"){
+      const doctor = await Doctor.findOne(({email: user.email}))
+
+      payload.doctorID = doctor._id,
+      payload.name = doctor.fullName
+  }
     //creating a variable to cary logged in user (necessary info for user)
     console.log(payload)
     const token = jwt.sign(payload, process.env.JWT_SECRET);

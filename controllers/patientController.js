@@ -42,12 +42,15 @@ async function showPatient(req,res,next){
 async function updatePatient(req,res,next){
     const id = req.params.patientID
     const patientUpdate = req.body
+    console.log(id)
+    console.log(req.currentUser.patientID === id)
 
     try{
         const updatedPatient = await Patient.findOne({_id:id})
 
         if(!updatedPatient) return res.json({message: "Patient not found by ID"})
-
+        if(req.currentUser.role==="doctor") return res.json({message: "Doctors cannot edit patients profiles"})
+        if(req.currentUser.patientID !== id) return res.json({message: `Unauthorized: You do not have permission to edit this profile`})
         updatedPatient.set(patientUpdate)
         await updatedPatient.save()
 
@@ -57,15 +60,20 @@ async function updatePatient(req,res,next){
     }
 }
 
-//!add auth to check if it current user is the same as the one found
 async function removePatient(req,res,next){
     const id = req.params.patientID
-    const deletedPatient = await Patient.findByIdAndDelete(id)
+    try{
+        if(req.currentUser.role==="doctor") return res.json({message: "Doctors cannot remove user profiles"})
+        if(req.currentUser.patientID !== id) return res.json({message: `Unauthorized: You do not have permission to remove this profile`})
+        const deletedPatient = await Patient.findByIdAndDelete(id)
+        console.log(deletedPatient)
+        if(!deletedPatient) return res.json({ message: "patient not found" })
+        res.sendStatus(204)
+    } catch(e){
+        next(e)
+    }
 
-    console.log(deletedPatient)
 
-    if(!deletedPatient) return res.json({ message: "patient not found" })
-    res.sendStatus(204)
 }
 
 export default {

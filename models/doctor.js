@@ -12,7 +12,7 @@ const addressSchema = new mongoose.Schema({
 const reviewSchema = new mongoose.Schema({
   rate: { type: Number },
   comment: { type: String, trim: true, maxLength: 450 },
-  // user: { type: mongoose.Schema.ObjectId, ref: "User", required: true },
+  user: { type: mongoose.Schema.ObjectId, ref: "Patient", required: true },
   createdAt: { type: Date, default: Date.now },
 });
 const doctorSchema = new mongoose.Schema({
