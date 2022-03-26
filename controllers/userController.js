@@ -52,8 +52,6 @@ async function register(req, res, next) {
     //try to send email for user
     // if succeed creat user other wise ask them to register with real email address
     console.log(code, expiry);
-    const info = await mailer.sendConfirmationEmail(newUser.email, code);
-    if (info.err) throw new Error("verification email failed");
     const createdUser = await User.create({
       ...newUser,
       password: hashedPassword,
@@ -110,36 +108,24 @@ async function login(req, res, next) {
     );
     let payload = {};
     if (!isItMatch) throw new Error("invalid login");
-    if (user.role === "patient") {
-      const patient = await Patient.findOne({ email: user.email });
-      payload = {
-        userId: user._id,
-        email: user.email,
-        password: user.password,
-        role: user.role,
-        patientID: patient._id,
-        name: patient.fullName,
-      };
-    }
-    if (user.role === "doctor") {
-      const doctor = await Doctor.findOne({ email: user.email });
-      payload = {
-        userId: user._id,
-        email: user.email,
-        password: user.password,
-        role: user.role,
-        doctorID: doctor._id,
-        name: doctor.fullName,
-      };
-    }
+
+    payload = {
+      userId: user._id,
+      email: user.email,
+      password: user.password,
+      role: user.role,
+    };
+
     if(user.role === "patient") {
       const patient = await Patient.findOne(({email: user.email}))
       payload.patientID = patient._id,
       payload.name = patient.fullName
+      
     }else if(user.role === "doctor"){
       const doctor = await Doctor.findOne(({email: user.email}))
 
-      (payload.doctorID = doctor._id), (payload.name = doctor.fullName);
+      payload.doctorID = doctor._id
+      payload.name = doctor.fullName
     }
     //creating a variable to cary logged in user (necessary info for user)
     console.log(payload);
