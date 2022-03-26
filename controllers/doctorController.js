@@ -69,20 +69,31 @@ async function removeDoctor(req, res, next) {
   res.sendStatus(204);
 }
 
-// search doctors based on postcode: for substring search, case insensitive
-async function searchByPostcode(req, res) {
+// search doctors: for substring search, case insensitive
+async function searchDoctors(req, res) {
+  let { postcode, speciality, name, language } = req.query;
+  const filters = {};
+  if (postcode) {
+    filters["address.postcode"] = new RegExp(postcode, "i");
+  }
+  if (speciality) {
+    filters.specialities = new RegExp(speciality, "i");
+  }
+  if (name) {
+    filters.fullName = new RegExp(name, "i");
+  }
+  if (language) {
+    filters.languages = new RegExp(language, "i");
+  }
   try {
-    const postcodeAsQuery = req.query.postcode;
-    console.log(postcodeAsQuery);
-    const matchingDoctor = await Doctor.find({
-      "address.postcode": new RegExp(postcodeAsQuery, "i"),
-    });
+    console.log(filters);
+    const matchingDoctor = await Doctor.find(filters);
     if (matchingDoctor.length === 0) {
       return res.status(200).json({ message: "No matching result found." });
     }
     res.status(200).json(matchingDoctor);
   } catch (e) {
-    res.send({ message: "there was a problem searching a doctor." });
+    res.send({ message: "There was a problem searching a doctor." });
   }
 }
 
@@ -92,5 +103,5 @@ export default {
   showDoctor,
   updateDoctor,
   removeDoctor,
-  searchByPostcode,
+  searchDoctors,
 };

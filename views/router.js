@@ -11,6 +11,7 @@ router.get("/", (req, res) => {
   res.status(200).send("API Running");
 });
 // get users, register, login and verifyAccount routs
+
 router.route("/users").get(auth, userController.getUsersList);
 router.route("/users/register").post(
     [
@@ -64,8 +65,8 @@ router
     ],
     userController.resetPassword
   );
-// doctors
 
+// doctors
 router
   .route("/patients")
   //should not be visible to viewers
@@ -85,8 +86,9 @@ router
   .get(doctorController.findDoctors)
   .post(doctorController.createDoctor);
 
-//find doctor(s)
-router.route("/doctor").get(doctorController.searchByPostcode);
+//search doctor(s)
+router.route("/doctors/search").get(doctorController.searchDoctors);
+
 router
   .route("/doctor/:doctorID")
   .get(doctorController.showDoctor)

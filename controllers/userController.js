@@ -26,6 +26,7 @@ async function register(req, res, next) {
     const existedUser = await User.exists({ email: req.body.email });
     //if user is registered but the account was deleted which means the account is unavailable more
     // then they need to re-activate their accounts again
+
     if (existedUser && existedUser.active === 0) throw new Error("not active");
     if (existedUser) throw new Error("user existed");
     if (!passwordsFunctions.confirmPassword(  req.body.password,  req.body.confirmPassword)) {
@@ -69,6 +70,7 @@ async function register(req, res, next) {
     next(err);
   }
 }
+
 //login process and generating a token
 async function login(req, res, next) {
   try {

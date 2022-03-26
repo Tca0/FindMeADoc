@@ -20,13 +20,18 @@ const doctorSchema = new mongoose.Schema({
   secondName: { type: String, lowercase: true, trim: true },
   fullName: { type: String, toLowerCase: true },
   email: { type: String, unique: true, lowercase: true, required: true },
-  specialties: [{type: String}],
+  specialties: [{ type: String }],
   DOB: { type: Date, default: Date.now },
-  gender: { type: String, enum: ["male", "female", "other"], lowercase: true, trim: true },
-  contactNumber: {type:Number},
+  gender: {
+    type: String,
+    enum: ["male", "female", "other"],
+    lowercase: true,
+    trim: true,
+  },
+  contactNumber: { type: Number },
   address: [addressSchema],
   registerAt: { type: Date, default: Date.now },
-  languages: [{type: String}],
+  languages: [{ type: String }],
   reviews: [reviewSchema],
   // boolean value to decide if account is active or not
   //by default is un-active
@@ -34,8 +39,8 @@ const doctorSchema = new mongoose.Schema({
   completed: { type: Boolean, default: 0 },
   //profile pic url
   //profilePic: { type:string }
-  about: {type: String},
-  experience: { type: Number}
+  about: { type: String },
+  experience: { type: Number },
 });
 
 export default mongoose.model("Doctor", doctorSchema);
