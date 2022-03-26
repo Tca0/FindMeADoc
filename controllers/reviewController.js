@@ -2,15 +2,19 @@ import { validationResult } from "express-validator";
 import Doctor from "../models/doctor.js";
 
 async function create(req, res, next) {
-  // const errors = validationResult(req)
-  // console.log(errors)
-  // console.log(Object.keys(errors))
-  // console.log("Number of errors", errors.errors.length)
-  // if (!errors.isEmpty()) {
-  //     return res.status(400).json({ errors: errors.array() })
-  // }
+  // validation
+  const errors = validationResult(req);
+  console.log(errors);
+  console.log(Object.keys(errors));
+  console.log("Number of errors", errors.errors.length);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   const { body: newReview } = req;
+  newReview.user = req.currentUser.userId;
   const doctorID = req.params.doctorID;
+
   try {
     const reviewsOnDoctor = await Doctor.findById(doctorID);
     if (!reviewsOnDoctor) {
@@ -29,7 +33,6 @@ async function create(req, res, next) {
 }
 
 async function update(req, res, next) {
-  //!need to add auth
   const { doctorID, reviewID } = req.params;
   console.log(doctorID, reviewID);
   console.log(req.body);
@@ -51,7 +54,11 @@ async function update(req, res, next) {
         .send({ message: `Review with ${reviewID} not found` });
     }
 
-    //!check validation via email
+    if (req.currentUser.userId !== review.user.toString()) {
+      return res
+        .status(401)
+        .send({ message: "Unauthorized - You didn't create that comment" });
+    }
 
     review.set(req.body);
 
@@ -63,7 +70,6 @@ async function update(req, res, next) {
 }
 
 async function remove(req, res, next) {
-  //!need to add auth
   const { doctorID, reviewID } = req.params;
   console.log(doctorID, reviewID);
   console.log(req.body);
@@ -85,7 +91,11 @@ async function remove(req, res, next) {
         .send({ message: `Review with ${reviewID} not found` });
     }
 
-    //!check validation via email
+    if (req.currentUser.userId !== review.user.toString()) {
+      return res
+        .status(401)
+        .send({ message: "Unauthorized - You didn't create that comment" });
+    }
 
     review.remove();
 
