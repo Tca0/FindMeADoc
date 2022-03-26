@@ -1,21 +1,25 @@
 import express from "express";
 import userController from "../controllers/userController.js";
-import patientController from "../controllers/patientController.js"
-import doctorController from "../controllers/doctorController.js"
-import reviewController from "../controllers/reviewController.js"
+import patientController from "../controllers/patientController.js";
+import doctorController from "../controllers/doctorController.js";
+import reviewController from "../controllers/reviewController.js";
 import { check } from "express-validator";
 import auth from "../middleware/auth.js";
 const router = express.Router();
 
 router.get("/", (req, res) => {
-  res.status(200).send("API Running")
-})
+  res.status(200).send("API Running");
+});
 // get users, register, login and verifyAccount routs
 router.route("/users").get(userController.getUsersList);
 router.route("/users/register").post(userController.register);
-router.route("/users/login").post([check("email", "Should be an email").isEmail()],userController.login)
-router.route("/users/verifyAccount").patch(userController.verifyAccount)
-router.route("/users/changePassword").patch(auth, userController.changePassword);
+router
+  .route("/users/login")
+  .post([check("email", "Should be an email").isEmail()], userController.login);
+router.route("/users/verifyAccount").patch(userController.verifyAccount);
+router
+  .route("/users/changePassword")
+  .patch(auth, userController.changePassword);
 
 // doctors
 router
@@ -36,8 +40,8 @@ router
   .get(doctorController.findDoctors)
   .post(doctorController.createDoctor);
 
-//find doctor(s)
-router.route("/doctor").get(doctorController.searchByPostcode);
+//search doctor(s)
+router.route("/doctors/search").get(doctorController.searchDoctors);
 
 router
   .route("/doctor/:doctorID")
