@@ -5,6 +5,7 @@ import Doctor from "../models/doctor.js";
 import { validationResult } from "express-validator";
 import passwordsFunctions from "../db/helpers/passwordsFunctions.js";
 import mailer from "../db/helpers/mailer.js";
+import {ObjectId} from "mongodb"
 // get all users
 async function getUsersList(req, res, next) {
   const { currentUser } = body.req;
@@ -151,7 +152,7 @@ async function verifyAccount(req, res, next) {
     if (!user) throw new Error("user not found");
     if (user.active)
       throw new Error(
-        "account already activated, please login to your account"
+        "already activated"
       );
     console.log(user.verifyCode, typeof user.verifyCode);
     console.log(decodedToken.code, typeof `${decodedToken.code}`);
@@ -202,8 +203,10 @@ async function changePassword(req, res, next) {
   const { currentUser } = req;
   const errors = validationResult(req);
   try {
-    console.log(currentUser);
+    console.log("current user",currentUser);
     if (errors.errors.length !== 0) throw new Error(errors.errors[0].msg);
+    console.log(userId, typeof(userId))
+    console.log(currentUser.userId, typeof currentUser.userId);
     if (userId !== currentUser.userId) throw new Error("no-authentication");
     const isItMatch = await passwordsFunctions.comparePassword(
       req.currentUser.password,
@@ -288,23 +291,25 @@ async function resetPassword(req, res, next) {
       confirmPassword
     );
     if (!isItMatch) throw new Error("password not confirmed");
-    const user = await User.findOne({
-      _id: decodedToken.userId,
-      resetPasswordToken: token,
-    });
-    //check if token not expired
-    // convert new password to hashed password
-    // update document and save then return response.
+    console.log(decodedToken)
+    // find the user from the token
+    const user = await User.findById(decodedToken.userId);
     if (!user) throw new Error("no-authentication");
+    console.log(user)
+    // check if the user has the token to reset password
+    if(user.resetPasswordToken !== token) throw new Error("No request")
+    //check if token not expired
     const expiredLink = await User.findOne({
-      _id: decodedToken.userId,
+      _id: user._id,
       resetPasswordExpires: { $gt: Date.now() },
     });
-    console.log(expiredLink);
+    console.log("checking expired link", expiredLink);
     if (!expiredLink) throw new Error("reset password expired");
+    // convert new password to hashed password
+    // update document and save then return response.
     const hashedPassword = await passwordsFunctions.hashPassword(newPassword);
     const newUser = await User.findOneAndUpdate(
-      { _id: decodedToken.userId },
+      { _id: user._id },
       {
         password: hashedPassword,
         resetPasswordToken: null,

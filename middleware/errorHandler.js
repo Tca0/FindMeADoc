@@ -1,7 +1,7 @@
 export default function errorHandler(err, req, res, next) {
   console.log("error", err.message);
-  if (err.message === "no-authentication") {
-    return res.status(401).json({message: "request is unauthorized"})
+  if (err.message.includes("no-authentication")) {
+    return res.status(401).json({ message: "request is unauthorized" });
   }
     if (err.message === "empty DB") {
       return res.status(404).json({ message: "No users registered" });
@@ -63,6 +63,14 @@ export default function errorHandler(err, req, res, next) {
   }
   if (err.message === "wrong code") {
     return res.status(401).json({ message: "invalid activation code"})
+  }
+  if (err.message === "already activated") {
+    return res.status(400).json({
+      message: "account already activated, please login to your account",
+    });
+  }
+  if (err.message === "No request") {
+    return res.status(401).json({ message: "The user didn't make a request to change password" });
   }
     //default error
     res.sendStatus(500);

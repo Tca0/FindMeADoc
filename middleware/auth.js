@@ -1,10 +1,9 @@
 import jwt from "jsonwebtoken";
 import User from "../models/user.js";
-import Patient from "../models/patient.js"
 
 export default async function auth(req, res, next) {
   const rawToken = req.headers.authorization;
-  console.log(rawToken);
+  console.log("rowToken",rawToken);
   try {
     if (JSON.stringify(rawToken) === "{}") {
       return res.status(400).json({
