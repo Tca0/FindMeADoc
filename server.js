@@ -8,7 +8,6 @@ import errorHandler from "./middleware/errorHandler.js"
 async function startServer() {
     const app = express();
     dotenv.config();
-    console.log(process.env)
     const PORT = process.env.PORT ? process.env.PORT : 4000;
     app.use(cors());
     app.use(express.json());
