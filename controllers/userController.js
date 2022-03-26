@@ -235,10 +235,14 @@ async function resetPassword(req, res, next){
     });
     console.log(expiredLink)
     if(!expiredLink) throw new Error("reset password expired")
-
+    const hashedPassword = await passwordsFunctions.hashPassword(newPassword);
     const newUser = await User.findOneAndUpdate(
       { _id: decodedToken.userId },
-      { password: newPassword },
+      {
+        password: hashedPassword,
+        resetPasswordToken: null,
+        resetPasswordExpires: null
+      },
       { new: true }
     );
     res.status(200).json({message: "password has been reset, login again"})
