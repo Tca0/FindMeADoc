@@ -52,8 +52,6 @@ async function register(req, res, next) {
     //try to send email for user
     // if succeed creat user other wise ask them to register with real email address
     console.log(code, expiry);
-    const info = await mailer.sendConfirmationEmail(newUser.email, code);
-    if (info.err) throw new Error("verification email failed");
     const createdUser = await User.create({
       ...newUser,
       password: hashedPassword,
@@ -67,7 +65,7 @@ async function register(req, res, next) {
       role: createdUser.role,
       code: code,
     };
-    console.log("payload",payload);
+    console.log("payload", payload);
     const token = jwt.sign(payload, process.env.JWT_SECRET);
     const info = await mailer.sendConfirmationEmail(newUser.email, token);
     if (info.err) throw new Error("verification email failed");
@@ -110,36 +108,22 @@ async function login(req, res, next) {
     );
     let payload = {};
     if (!isItMatch) throw new Error("invalid login");
+
+    payload = {
+      userId: user._id,
+      email: user.email,
+      password: user.password,
+      role: user.role,
+    };
+
     if (user.role === "patient") {
       const patient = await Patient.findOne({ email: user.email });
-      payload = {
-        userId: user._id,
-        email: user.email,
-        password: user.password,
-        role: user.role,
-        patientID: patient._id,
-        name: patient.fullName,
-      };
-    }
-    if (user.role === "doctor") {
+      (payload.patientID = patient._id), (payload.name = patient.fullName);
+    } else if (user.role === "doctor") {
       const doctor = await Doctor.findOne({ email: user.email });
-      payload = {
-        userId: user._id,
-        email: user.email,
-        password: user.password,
-        role: user.role,
-        doctorID: doctor._id,
-        name: doctor.fullName,
-      };
-    }
-    if(user.role === "patient") {
-      const patient = await Patient.findOne(({email: user.email}))
-      payload.patientID = patient._id,
-      payload.name = patient.fullName
-    }else if(user.role === "doctor"){
-      const doctor = await Doctor.findOne(({email: user.email}))
 
-      (payload.doctorID = doctor._id), (payload.name = doctor.fullName);
+      payload.doctorID = doctor._id;
+      payload.name = doctor.fullName;
     }
     //creating a variable to cary logged in user (necessary info for user)
     console.log(payload);
@@ -165,10 +149,14 @@ async function verifyAccount(req, res, next) {
     });
     console.log("user", user);
     if (!user) throw new Error("user not found");
-    if(user.active) throw new Error("account already activated, please login to your account")
+    if (user.active)
+      throw new Error(
+        "account already activated, please login to your account"
+      );
     console.log(user.verifyCode, typeof user.verifyCode);
     console.log(decodedToken.code, typeof `${decodedToken.code}`);
-    if (user.verifyCode !== `${decodedToken.code}`) throw new Error("wrong code");
+    if (user.verifyCode !== `${decodedToken.code}`)
+      throw new Error("wrong code");
     //check if link is expired
     const expiredLink = await User.findOne({
       _id: decodedToken.userId,
@@ -177,13 +165,13 @@ async function verifyAccount(req, res, next) {
     if (!expiredLink) {
       const code = Math.floor(100000 + Math.random() * 900000); //Generate random 6 digit code.
       const expiry = Date.now() + 60 * 1000 * 15; // expire after 15 mins
-      decodedToken.code = code
-      console.log(decodedToken)
+      decodedToken.code = code;
+      console.log(decodedToken);
       const newToken = jwt.sign(decodedToken, process.env.JWT_SECRET);
       console.log(newToken);
       user.verifyCode = code;
-      user.verifyAccountExpires = expiry
-      user.save()
+      user.verifyAccountExpires = expiry;
+      user.save();
       const info = mailer.sendConfirmationEmail(decodedToken.email, newToken);
       return res.status(401).json({
         message:
@@ -255,9 +243,9 @@ async function forgotPassword(req, res, next) {
       role: user.role,
       code: code,
     };
-    console.log(payload,"payload")
+    console.log(payload, "payload");
     const token = jwt.sign(payload, process.env.JWT_SECRET);
-    console.log(token)
+    console.log(token);
     //trying to store the value of sending male value in a variable but undefined
     const info = await mailer.sendResetPasswordEmail(email, token);
     if (info.err) {
@@ -265,7 +253,11 @@ async function forgotPassword(req, res, next) {
     }
     //update the requested user with reset password token and expiry time
     console.log(user.resetPasswordToken, user.resetPasswordExpires);
-    console.log("before updating",user.resetPasswordToken, user.resetPasswordExpires);
+    console.log(
+      "before updating",
+      user.resetPasswordToken,
+      user.resetPasswordExpires
+    );
     const passwordToReset = await User.findOneAndUpdate(
       {
         email: email,
