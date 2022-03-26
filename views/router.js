@@ -35,7 +35,7 @@ router.route("/users/login").post(
     ],
     userController.login
   );
-router.route("/users/verifyAccount").patch(userController.verifyAccount);
+router.route("/users/confirm/:token/account").patch(userController.verifyAccount);
 router.route("/users/:userId/changePassword").patch(auth,
     [
       check("oldPassword", "empty filed").exists(),
