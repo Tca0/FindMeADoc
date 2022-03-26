@@ -58,6 +58,9 @@ export default function errorHandler(err, req, res, next) {
   if (err.message === "reset link failed") {
     res.status(500).json({message : "couldn't sent reset password link please try again later"})
   }
+  if(err.message === "reset password expired") {
+    return res.status(401).json({ message: "link expired, request new link please" });
+  }
     //default error
     res.sendStatus(500);
 }

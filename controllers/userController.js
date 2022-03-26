@@ -115,6 +115,16 @@ async function login(req, res, next) {
         name: doctor.fullName,
       };
     }
+    if(user.role === "patient") {
+      const patient = await Patient.findOne(({email: user.email}))
+      payload.patientID = patient._id,
+      payload.name = patient.fullName
+    }else if(user.role === "doctor"){
+      const doctor = await Doctor.findOne(({email: user.email}))
+
+      payload.doctorID = doctor._id,
+      payload.name = doctor.fullName
+  }
     //creating a variable to cary logged in user (necessary info for user)
     console.log(payload);
     const token = jwt.sign(payload, process.env.JWT_SECRET);
@@ -200,6 +210,7 @@ async function forgotPassword(req, res, next) {
       role: user.role,
       code: code,
     };
+    console.log(payload,"payload")
     const token = jwt.sign(payload, process.env.JWT_SECRET);
     //trying to store the value of sending male value in a variable but undefined
     const info = await mailer.sendResetPasswordEmail(email, token);
@@ -207,20 +218,18 @@ async function forgotPassword(req, res, next) {
       throw new Error("reset link failed");
     }
     console.log(user.resetPasswordToken, user.resetPasswordExpires);
-    user.resetPasswordToken = token;
-    user.resetPasswordExpires = expiry;
-    console.log(
-      "before updating",
-      user.resetPasswordToken,
-      user.resetPasswordExpires
-    );
+
+    // user.resetPasswordToken = token;
+    // user.resetPasswordExpires = new Date(expiry)
+    console.log("before updating",user.resetPasswordToken, user.resetPasswordExpires);
+
     const passwordToReset = await User.findOneAndUpdate(
       {
         email: email,
       },
       {
         resetPasswordToken: token,
-        resetPasswordExpires: expiry,
+        resetPasswordExpires: new Date(expiry)
       },
       { new: true }
     );
@@ -230,9 +239,10 @@ async function forgotPassword(req, res, next) {
     next(err);
   }
 }
-async function resetPassword(req, res, next) {
-  const { code, newPassword, confirmPassword } = req.body;
-  const { token } = req.params;
+
+async function resetPassword(req, res, next){
+  const { newPassword, confirmPassword } = req.body
+  const { token } = req.params
   // console.log(token)
   const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
   // console.log(decodedToken)
@@ -241,20 +251,30 @@ async function resetPassword(req, res, next) {
     if (errors.errors.length !== 0) throw new Error(errors.errors[0].msg);
     //test if code is valid
     // all steps that use code to reset and verify will change by converting codes to tokens
-    const isItMatch = passwordsFunctions.confirmPassword(
-      newPassword,
-      confirmPassword
-    );
-    if (!isItMatch) throw new Error("password not confirmed");
-    const user = await User.findById(decodedToken.userId);
+    const isItMatch = passwordsFunctions.confirmPassword(newPassword, confirmPassword)
+    if(!isItMatch) throw new Error("password not confirmed");
+    const user = await User.findOne({
+      _id: decodedToken.userId,
+      resetPasswordToken: token,
+    });
     //check if token not expired
     // convert new password to hashed password
     // update document and save then return response.
-    console.log(user);
-    if (!user) throw new Error("no-authentication");
+    if(!user) throw new Error("no-authentication");
+    const expiredLink = await User.findOne({
+      _id: decodedToken.userId,
+      resetPasswordExpires: { $gt: Date.now() },
+    });
+    console.log(expiredLink)
+    if(!expiredLink) throw new Error("reset password expired")
+    const hashedPassword = await passwordsFunctions.hashPassword(newPassword);
     const newUser = await User.findOneAndUpdate(
-      { email: currentUser.email },
-      { password: newPassword },
+      { _id: decodedToken.userId },
+      {
+        password: hashedPassword,
+        resetPasswordToken: null,
+        resetPasswordExpires: null
+      },
       { new: true }
     );
     res.status(200).json({ message: "password has been reset, login again" });
