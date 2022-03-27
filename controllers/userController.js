@@ -5,7 +5,6 @@ import Doctor from "../models/doctor.js";
 import { validationResult } from "express-validator";
 import passwordsFunctions from "../db/helpers/passwordsFunctions.js";
 import mailer from "../db/helpers/mailer.js";
-import {ObjectId} from "mongodb"
 // get all users
 async function getUsersList(req, res, next) {
   const { currentUser } = body.req;
@@ -151,10 +150,7 @@ async function verifyAccount(req, res, next) {
     });
     console.log("user", user);
     if (!user) throw new Error("user not found");
-    if (user.active)
-      throw new Error(
-        "already activated"
-      );
+    if (user.active) throw new Error("already activated");
     console.log(user.verifyCode, typeof user.verifyCode);
     console.log(decodedToken.code, typeof `${decodedToken.code}`);
     if (user.verifyCode !== `${decodedToken.code}`)
@@ -204,13 +200,17 @@ async function changePassword(req, res, next) {
   const { currentUser } = req;
   const errors = validationResult(req);
   try {
-    console.log("current user, old payload",currentUser);
+    console.log("current user, old payload", currentUser);
     if (errors.errors.length !== 0) throw new Error(errors.errors[0].msg);
-    console.log(userId, typeof(userId))
+    console.log(userId, typeof userId);
     console.log(currentUser.userId, typeof currentUser.userId);
     if (userId !== currentUser.userId) throw new Error("no-authentication");
-    const userToChangePassword = await User.findById(currentUser.userId)
-    console.log("this user is requesting change password and approved by token",userToChangePassword)
+    const userToChangePassword = await User.findById(currentUser.userId);
+    console.log(
+      "this user is requesting change password and approved by token",
+      userToChangePassword
+    );
+    //compare the old password that entered with thw one that stored in DB
     const isItMatch = await passwordsFunctions.comparePassword(
       userToChangePassword.password,
       oldPassword
@@ -225,13 +225,16 @@ async function changePassword(req, res, next) {
       { password: password },
       { new: true }
     );
-    req.currentUser.password = password
+    req.currentUser.password = password;
     console.log("new password", currentUser.password);
-    console.log("new payload", currentUser)
-    await newUser.save()
-    console.log("new user",newUser)
-    const isRight = await passwordsFunctions.comparePassword(newUser.password, oldPassword)
-    console.log("is working after change",isRight)
+    console.log("new payload", currentUser);
+    await newUser.save();
+    console.log("new user", newUser);
+    const isRight = await passwordsFunctions.comparePassword(
+      newUser.password,
+      oldPassword
+    );
+    console.log("is working after change", isRight);
     res.status(200).json({ message: "password has been changed" });
   } catch (err) {
     next(err);
@@ -301,13 +304,13 @@ async function resetPassword(req, res, next) {
       confirmPassword
     );
     if (!isItMatch) throw new Error("password not confirmed");
-    console.log(decodedToken)
+    console.log(decodedToken);
     // find the user from the token
     const user = await User.findById(decodedToken.userId);
     if (!user) throw new Error("no-authentication");
-    console.log(user)
+    console.log(user);
     // check if the user has the token to reset password
-    if(user.resetPasswordToken !== token) throw new Error("No request")
+    if (user.resetPasswordToken !== token) throw new Error("No request");
     //check if token not expired
     const expiredLink = await User.findOne({
       _id: user._id,
