@@ -24,9 +24,10 @@ async function register(req, res, next) {
     const errors = validationResult(req);
     if (errors.errors.length !== 0) throw new Error(errors.errors[0].msg);
     //exists function return objectId if user existed otherwise will return a null
-    const existedUser = await User.exists({ email: req.body.email });
+    const existedUser = await User.findOne({ email: req.body.email });
     //if user is registered but the account was deleted which means the account is unavailable more
     // then they need to re-activate their accounts again
+    console.log(existedUser)
     if (existedUser && !existedUser.active) throw new Error("not active");
     if (existedUser) throw new Error("user existed");
     if (
@@ -41,7 +42,7 @@ async function register(req, res, next) {
       email: req.body.email,
       password: req.body.password,
     };
-    req.body.role?newUser.role=req.body.role:""
+    (req.body.role)? newUser.role= req.body.role : ""
     console.log(newUser);
     //hashing password
     const hashedPassword = await passwordsFunctions.hashPassword(
