@@ -42,6 +42,7 @@ async function register(req, res, next) {
       email: req.body.email,
       password: req.body.password,
     };
+    req.body.role?newUser.role=req.body.role:""
     console.log(newUser);
     //hashing password
     const hashedPassword = await passwordsFunctions.hashPassword(
