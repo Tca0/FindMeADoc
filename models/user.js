@@ -16,12 +16,16 @@ const userSchema = new mongoose.Schema({
   },
   registeredAt: { type: Date, default: Date.now },
   active: { type: Boolean, default: 0 },
-  completed: { type: Boolean, default: 0 },
-  resetPasswordToken: { type: String, default: null },
-  resetPasswordExpires: { type: Date, default: null },
   verifyCode: { type: String },
   verifyAccountExpires: { type: Date, default: null },
+  verifiedAt: { type: Date, default: null },
+  loggedIinAt: [{ type: Date, default: null }],
+  resetPasswordToken: { type: String, default: null },
+  resetPasswordExpires: { type: Date, default: null },
+  passwordResetAt: { type: Date, default: null },
+  passwordChangedAt: {type: Date, default: null},
+  accountDeleted: { type: Boolean, default:0}
 });
 
 export default mongoose.model("User", userSchema);
-"2000-01-01"
+("2000-01-01");

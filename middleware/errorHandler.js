@@ -72,6 +72,9 @@ export default function errorHandler(err, req, res, next) {
   if (err.message === "No request") {
     return res.status(401).json({ message: "The user didn't make a request to change password" });
   }
+  if (err.message === "Account deleted") {
+    return res.status(204).json({message: "Account deleted, please contact help center to reactivate your account or more details"})
+  }
     //default error
     res.sendStatus(500);
 }

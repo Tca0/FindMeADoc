@@ -28,6 +28,7 @@ async function register(req, res, next) {
     //if user is registered but the account was deleted which means the account is unavailable more
     // then they need to re-activate their accounts again
     console.log(existedUser)
+    if (existedUser.accountDeleted) throw new Error("Account deleted");
     if (existedUser && !existedUser.active) throw new Error("not active");
     if (existedUser) throw new Error("user existed");
     if (
@@ -84,7 +85,6 @@ async function register(req, res, next) {
     }
     res.status(200).json({
       message: "registration successful, verify your account using code",
-      code,
       token,
     });
   } catch (err) {
@@ -102,36 +102,39 @@ async function login(req, res, next) {
     const user = await User.findOne({ email: req.body.email });
     console.log(user);
     if (!user) throw new Error("invalid login");
+    if (user.accountDeleted) throw new Error("Account deleted")
     if (!user.active) throw new Error("Not active");
     //it will compare the entered password with the hashed one(remember that)
     const isItMatch = await passwordsFunctions.comparePassword(
       user.password,
       req.body.password
     );
-    let payload = {};
+    
     if (!isItMatch) throw new Error("invalid login");
-
+    const loggedIinAt = Date.now();
+    let payload = {};
     payload = {
       userId: user._id,
       email: user.email,
-      password: user.password,
       role: user.role,
+      loggedIinAt,
     };
-
+    user.loggedIinAt.push(loggedIinAt);
+    user.save()
     if (user.role === "patient") {
       const patient = await Patient.findOne({ email: user.email });
       (payload.patientID = patient._id), (payload.name = patient.fullName);
     } else if (user.role === "doctor") {
       const doctor = await Doctor.findOne({ email: user.email });
-
       payload.doctorID = doctor._id;
       payload.name = doctor.fullName;
     }
     //creating a variable to cary logged in user (necessary info for user)
     console.log(payload);
-    const token = jwt.sign(payload, process.env.JWT_SECRET);
-    res.status(200).json({ payload, token });
+    const token = jwt.sign(payload, process.env.JWT_SECRET, {expiresIn : '24h'});
+    res.status(200).json({message:"Login success",token});
   } catch (err) {
+    console.log("there is error")
     next(err);
   }
 }
@@ -181,6 +184,7 @@ async function verifyAccount(req, res, next) {
     }
     user.verifyAccountExpires = null;
     user.active = 1;
+    user.verifiedAt = Date.now();
     user.verifyCode = null;
     await user.save();
     res.status(200).json({
@@ -201,10 +205,7 @@ async function changePassword(req, res, next) {
   const { currentUser } = req;
   const errors = validationResult(req);
   try {
-    console.log("current user, old payload", currentUser);
     if (errors.errors.length !== 0) throw new Error(errors.errors[0].msg);
-    console.log(userId, typeof userId);
-    console.log(currentUser.userId, typeof currentUser.userId);
     if (userId !== currentUser.userId) throw new Error("no-authentication");
     const userToChangePassword = await User.findById(currentUser.userId);
     console.log(
@@ -228,7 +229,6 @@ async function changePassword(req, res, next) {
     );
     req.currentUser.password = password;
     console.log("new password", currentUser.password);
-    console.log("new payload", currentUser);
     await newUser.save();
     console.log("new user", newUser);
     const isRight = await passwordsFunctions.comparePassword(
@@ -286,7 +286,7 @@ async function forgotPassword(req, res, next) {
       { new: true }
     );
     console.log(passwordToReset);
-    res.status(200).json({ message: "check your email please", token });
+    res.status(200).json({ message: "check your email please" });
   } catch (err) {
     next(err);
   }
