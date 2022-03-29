@@ -21,7 +21,7 @@ const doctorSchema = new mongoose.Schema({
   fullName: { type: String, toLowerCase: true },
   email: { type: String, unique: true, lowercase: true, required: true },
   specialties: [{ type: String }],
-  DOB: { type: Date, default: Date.now },
+  DOB: { type: Date,},
   gender: {
     type: String,
     enum: ["male", "female", "other"],
@@ -29,7 +29,7 @@ const doctorSchema = new mongoose.Schema({
     trim: true,
   },
   contactNumber: { type: Number },
-  address: [addressSchema],
+  address: addressSchema,
   registerAt: { type: Date, default: Date.now },
   languages: [{ type: String }],
   reviews: [reviewSchema],
