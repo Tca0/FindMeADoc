@@ -8,8 +8,8 @@ const addressSchema = new mongoose.Schema({
   enteredDate: { type: Date, default: Date.now },
 });
 const patientSchema = new mongoose.Schema({
-  firstName: { type: String, lowercase: true, trim: true },
-  secondName: { type: String, lowercase: true, trim: true },
+  firstName: { type: String, trim: true },
+  secondName: { type: String, trim: true },
   fullName: { type: String, toLowerCase: true },
   DOB: { type: Date, default: Date.now },
   gender: {
