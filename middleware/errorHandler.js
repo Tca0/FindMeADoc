@@ -14,7 +14,8 @@ export default function errorHandler(err, req, res, next) {
     }
   if (
     err.message.includes("invalid email") ||
-    err.message === "Invalid email"
+    err.message === "Invalid email" ||
+    err.message === "not registered"
   ) {
     return res.status(405).json({ message: "please use a valid email format" });
   }
@@ -56,7 +57,7 @@ export default function errorHandler(err, req, res, next) {
     res.status(500).json({message: "couldn't verify email/send verification email, please try register with a valid email."})
   }
   if (err.message === "reset link failed") {
-    res.status(500).json({message : "couldn't sent reset password link please try again later"})
+    res.status(405).json({message : "couldn't sent reset password link please try again later"})
   }
   if(err.message === "reset password expired") {
     return res.status(401).json({ message: "link expired, request new link please" });
@@ -68,7 +69,6 @@ export default function errorHandler(err, req, res, next) {
     return res.status(201).json({
       message: "account already activated, please login to your account",
     });
-    // return res.redirect("http://localhost:3000/users/login");
   }
   if (err.message === "No request") {
     return res.status(401).json({ message: "The user didn't make a request to change password" });
