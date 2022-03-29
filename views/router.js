@@ -100,14 +100,14 @@ router
 router.route("/doctors/search").get(doctorController.searchDoctors);
 
 router
-  .route("/doctor/:doctorID")
+  .route("/doctors/:doctorID")
   .get(doctorController.showDoctor)
   .put(auth, doctorController.updateDoctor)
   .delete(auth, doctorController.removeDoctor);
 
 // doctor reviews
 router
-  .route("/doctor/:doctorID/reviews")
+  .route("/doctors/:doctorID/reviews")
   .post(
     auth,
     [
