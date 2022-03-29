@@ -34,6 +34,7 @@ const doctorSchema = new mongoose.Schema({
   languages: [{ type: String }],
   reviews: [reviewSchema],
   completed: { type: Boolean, default: 0 },
+  completedAt: {type: Date, default: null},
   //profile pic url
   //profilePic: { type:string }
   about: { type: String },

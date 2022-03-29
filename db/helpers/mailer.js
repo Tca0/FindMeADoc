@@ -21,7 +21,7 @@ async function sendConfirmationEmail(toAddress, code) {
         <h2>Hello</h2>
         <p>Thank you for subscribing. Please confirm your email by clicking on the following link</p>
         // should be linked to the front end
-        <a href=http://localhost:3000/confirm/${code}/account> Click here</a>
+        <a href=http://localhost:3000/users/confirm/${code}/account> Click here</a>
         </div>`,
     });
     return { err: false };

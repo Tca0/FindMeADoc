@@ -10,7 +10,7 @@ export default function errorHandler(err, req, res, next) {
     return res.status(400).json({ message: "Activate your account please."})
   }
     if (err.message === "user existed") {
-      return res.status(400).json({ message: "User already registered" });
+      return res.status(409).json({ message: "User already registered" });
     }
   if (
     err.message.includes("invalid email") ||
@@ -25,19 +25,19 @@ export default function errorHandler(err, req, res, next) {
     res.status(404).json({ message: "invalid login information"})
   }
   if (err.message === "user not found") {
-    res.status(400).json({ message: "Email address not found" });
+    res.status(404).json({ message: "Email address not found" });
   }
   if(err.message === "invalid old password") {
-    res.status(400).json({message: "old password doesn't match"})
+    res.status(404).json({message: "old password doesn't match"})
   }
   if (err.name === "JsonWebTokenError") {
-    return res.status(400).json({ message: "Could not verify JWT." })
+    return res.status(401).json({ message: "Invalid access." })
   }
   if (err.message === "Not active") {
-    return res.status(400).json({message: "Please verify your account to login, an email sent to you with verification code"})
+    return res.status(425).json({message: "Please verify your account to login, an email sent to you with verification code"})
   }
   if (err.message === "email required" || err.message === "empty filed") {
-    return res.status(400).json({ message: "please enter your email address" });
+    return res.status(406).json({ message: "please enter your email address" });
   }
   if (err.message === "Invalid value") {
     return res
@@ -47,10 +47,10 @@ export default function errorHandler(err, req, res, next) {
       });
   }
   if (err.message === "password required" || err.message === "empty password") {
-    return res.status(400).json({ message: "please enter your password" });
+    return res.status(406).json({ message: "please enter your password" });
   }
   if (err.message === "confirmPassword required") {
-    return res.status(400).json({ message: "please confirm your password" });
+    return res.status(406).json({ message: "please confirm your password" });
   }
   if (err.message === "verification email failed") {
     res.status(500).json({message: "couldn't verify email/send verification email, please try register with a valid email."})
@@ -65,9 +65,10 @@ export default function errorHandler(err, req, res, next) {
     return res.status(401).json({ message: "invalid activation code"})
   }
   if (err.message === "already activated") {
-    return res.status(400).json({
+    return res.status(201).json({
       message: "account already activated, please login to your account",
     });
+    // return res.redirect("http://localhost:3000/users/login");
   }
   if (err.message === "No request") {
     return res.status(401).json({ message: "The user didn't make a request to change password" });

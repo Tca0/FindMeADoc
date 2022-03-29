@@ -28,7 +28,8 @@ async function register(req, res, next) {
     //if user is registered but the account was deleted which means the account is unavailable more
     // then they need to re-activate their accounts again
     console.log(existedUser)
-    if (existedUser.accountDeleted) throw new Error("Account deleted");
+    if (existedUser && existedUser.accountDeleted)
+      throw new Error("Account deleted");
     if (existedUser && !existedUser.active) throw new Error("not active");
     if (existedUser) throw new Error("user existed");
     if (
@@ -142,7 +143,7 @@ async function login(req, res, next) {
 //if the link expired it will send new activation link to the user.
 async function verifyAccount(req, res, next) {
   const { token } = req.params;
-  console.log("token", token);
+  console.log("token", token, typeof token);
   //user will attach the code with their email then we check if match then user account will be activated
   try {
     //decode token and search for user
@@ -181,15 +182,17 @@ async function verifyAccount(req, res, next) {
         decodedToken,
         newToken,
       });
+    } else {
+      user.verifyAccountExpires = null;
+      user.active = 1;
+      user.verifiedAt = Date.now();
+      user.verifyCode = null;
+      await user.save();
+      res.status(200).json({
+        message: "Account activated, login please to complete your information",
+      });
+      // return res.status(302).redirect(`http://localhost:3000/users/confirmed/${user._id}`);
     }
-    user.verifyAccountExpires = null;
-    user.active = 1;
-    user.verifiedAt = Date.now();
-    user.verifyCode = null;
-    await user.save();
-    res.status(200).json({
-      message: "Account activated, login please to complete your information",
-    });
   } catch (err) {
     next(err);
   }

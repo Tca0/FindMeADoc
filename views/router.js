@@ -39,7 +39,13 @@ router
     ],
     userController.login
   );
-router.route("/users/confirm/:token/account").patch(userController.verifyAccount);
+  router.get("/users/confirm", (req, res) => {
+    console.log(req.params)
+    // res.status(200).send("confirm page Running");
+    console.log("fire");
+    return res.json({message: "hello"})
+  });
+router.route("/users/confirm/:token/account").get(userController.verifyAccount);
 router.route("/users/:userId/changePassword").patch(auth,
     [
       check("oldPassword", "empty filed").exists(),
