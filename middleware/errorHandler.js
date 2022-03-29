@@ -14,14 +14,18 @@ export default function errorHandler(err, req, res, next) {
     }
   if (
     err.message.includes("invalid email") ||
-    err.message === "Invalid email" ||
-    err.message === "not registered"
+    err.message === "Invalid email"
   ) {
     return res.status(405).json({ message: "please use a valid email format" });
   }
-  if(err.message === "password not confirmed") {
-    return res.status(404).json({ message: "password and confirmed password don't match" })
+  if (err.message === "not registered") {
+    return res.status(405).json({ message: "Email address not registered in this website" });
   }
+    if (err.message === "password not confirmed") {
+      return res
+        .status(404)
+        .json({ message: "password and confirmed password don't match" });
+    }
   if(err.message === "invalid login") {
     res.status(404).json({ message: "invalid login information"})
   }
