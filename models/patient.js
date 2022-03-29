@@ -18,7 +18,7 @@ const patientSchema = new mongoose.Schema({
     lowercase: true,
     trim: true,
   },
-  address: [addressSchema],
+  address: addressSchema,
   registerAt: { type: Date, default: Date.now },
   phone: { type: Number },
   email: { type: String, unique: true, lowercase: true, required: true },
