@@ -11,7 +11,7 @@ const patientSchema = new mongoose.Schema({
   firstName: { type: String, trim: true },
   secondName: { type: String, trim: true },
   fullName: { type: String, toLowerCase: true },
-  DOB: { type: Date, default: Date.now },
+  DOB: { type: Date },
   gender: {
     type: String,
     enum: ["male", "female", "other"],
