@@ -43,7 +43,7 @@ async function sendResetPasswordEmail(toAddress, code){
         <h2>Hello</h2>
         <p>click on the link to reset your password ${code}</p>
         // should be linked to the front end
-        <a href=http://localhost:3000/resetPassword/${code}> Click here</a>
+        <a href=http://localhost:3000/users/resetPassword/${code}> Click here</a>
         </div>`,
     });
     return { err: false }

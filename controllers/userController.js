@@ -259,6 +259,7 @@ async function forgotPassword(req, res, next) {
     const expiry = Date.now() + 60 * 1000 * 15;
     //generating token to be sent as alink
     const payload = {
+      email: user.email,
       userId: user._id,
       role: user.role,
       code: code,
@@ -297,7 +298,9 @@ async function forgotPassword(req, res, next) {
 async function resetPassword(req, res, next) {
   const { newPassword, confirmPassword } = req.body;
   const { token } = req.params;
-  const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+  console.log("token", token, typeof token);
+  const decodedToken = jwt.verify(token, "SX*&N1^1");
+  console.log(decodedToken)
   const errors = validationResult(req);
   try {
     if (errors.errors.length !== 0) throw new Error(errors.errors[0].msg);
