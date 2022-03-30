@@ -70,8 +70,8 @@ router
   .route("/users/resetPassword/:token")
   .patch(
     [
-      check("newPassword").exists(),
-      check("newPassword").notEmpty(),
+      check("password").exists(),
+      check("password").notEmpty(),
       check("confirmPassword").exists(),
       check("confirmPassword").notEmpty(),
     ],

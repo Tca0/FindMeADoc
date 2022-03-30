@@ -63,8 +63,13 @@ export default function errorHandler(err, req, res, next) {
   if (err.message === "reset link failed") {
     res.status(405).json({message : "couldn't sent reset password link please try again later"})
   }
-  if(err.message === "reset password expired") {
-    return res.status(401).json({ message: "link expired, request new link please" });
+  if (
+    err.message === "reset password expired" ||
+    err.message === "No request"
+  ) {
+    return res
+      .status(401)
+      .json({ message: "link expired, request new link please" });
   }
   if (err.message === "wrong code") {
     return res.status(401).json({ message: "invalid activation code"})
@@ -74,9 +79,9 @@ export default function errorHandler(err, req, res, next) {
       message: "account already activated, please login to your account",
     });
   }
-  if (err.message === "No request") {
-    return res.status(401).json({ message: "The user didn't make a request to change password" });
-  }
+  // if () {
+  //   return res.status(409).json({ message: "The user didn't make a request to change password" });
+  // }
   if (err.message === "Account deleted") {
     return res.status(204).json({message: "Account deleted, please contact help center to reactivate your account or more details"})
   }
