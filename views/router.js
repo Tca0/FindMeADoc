@@ -27,6 +27,7 @@ router
     ],
     userController.register
   );
+
 router
   .route("/users/login")
   .post(
@@ -39,12 +40,6 @@ router
     ],
     userController.login
   );
-  router.get("/users/confirm", (req, res) => {
-    console.log(req.params)
-    // res.status(200).send("confirm page Running");
-    console.log("fire");
-    return res.json({message: "hello"})
-  });
 router.route("/users/confirm/:token/account").get(userController.verifyAccount);
 router.route("/users/:userId/changePassword").patch(auth,
     [
