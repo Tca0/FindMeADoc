@@ -7,7 +7,8 @@ const addressSchema = new mongoose.Schema({
   postcode: { type: String, maxLength: 8, lowercase: true, trim: true },
   enteredDate: { type: Date, default: Date.now },
   lng:{type:Number},
-  lat:{type:Number }
+  lat:{type:Number },
+  coordinates:[String]
 });
 
 //for now each user can do one rating and 1 comment
