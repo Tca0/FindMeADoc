@@ -8,7 +8,7 @@ const addressSchema = new mongoose.Schema({
   enteredDate: { type: Date, default: Date.now },
   lng:{type:Number},
   lat:{type:Number },
-  coordinates:[String]
+  coordinates:[Number]
 });
 
 //for now each user can do one rating and 1 comment
