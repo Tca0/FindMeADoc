@@ -3,6 +3,8 @@ import userController from "../controllers/userController.js";
 import patientController from "../controllers/patientController.js";
 import doctorController from "../controllers/doctorController.js";
 import reviewController from "../controllers/reviewController.js";
+import languageController from "../controllers/languageController.js";
+import specialtyController from "../controllers/specialtyController.js";
 import { check } from "express-validator";
 import auth from "../middleware/auth.js";
 const router = express.Router();
@@ -39,14 +41,17 @@ router
     ],
     userController.login
   );
-  router.get("/users/confirm", (req, res) => {
-    console.log(req.params)
-    // res.status(200).send("confirm page Running");
-    console.log("fire");
-    return res.json({message: "hello"})
-  });
+router.get("/users/confirm", (req, res) => {
+  console.log(req.params);
+  // res.status(200).send("confirm page Running");
+  console.log("fire");
+  return res.json({ message: "hello" });
+});
 router.route("/users/confirm/:token/account").get(userController.verifyAccount);
-router.route("/users/:userId/changePassword").patch(auth,
+router
+  .route("/users/:userId/changePassword")
+  .patch(
+    auth,
     [
       check("oldPassword", "empty filed").exists(),
       check("oldPassword").notEmpty(),
@@ -70,8 +75,8 @@ router
   .route("/users/resetPassword/:token")
   .patch(
     [
-      check("newPassword").exists(),
-      check("newPassword").notEmpty(),
+      check("password").exists(),
+      check("password").notEmpty(),
       check("confirmPassword").exists(),
       check("confirmPassword").notEmpty(),
     ],
@@ -127,5 +132,11 @@ router
     reviewController.update
   )
   .delete(auth, reviewController.remove);
+
+// specialties
+router.route("/specialties").get(specialtyController.findLanguages);
+
+// languages
+router.route("/languages").get(languageController.findSpecialties);
 
 export default router;

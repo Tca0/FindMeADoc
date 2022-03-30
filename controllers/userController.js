@@ -259,6 +259,7 @@ async function forgotPassword(req, res, next) {
     const expiry = Date.now() + 60 * 1000 * 15;
     //generating token to be sent as alink
     const payload = {
+      email: user.email,
       userId: user._id,
       role: user.role,
       code: code,
@@ -295,36 +296,38 @@ async function forgotPassword(req, res, next) {
   }
 }
 async function resetPassword(req, res, next) {
-  const { newPassword, confirmPassword } = req.body;
+  const { password, confirmPassword } = req.body;
+  console.log(password, confirmPassword)
   const { token } = req.params;
   const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+  console.log("decoded token", decodedToken);
   const errors = validationResult(req);
   try {
+    console.log(errors.errors[0]);
     if (errors.errors.length !== 0) throw new Error(errors.errors[0].msg);
     //test if code is valid
     // all steps that use code to reset and verify will change by converting codes to tokens
     const isItMatch = passwordsFunctions.confirmPassword(
-      newPassword,
+      password,
       confirmPassword
     );
     if (!isItMatch) throw new Error("password not confirmed");
-    console.log(decodedToken);
     // find the user from the token
-    const user = await User.findById(decodedToken.userId);
+    const user = await User.findOne({email: decodedToken.email});
     if (!user) throw new Error("no-authentication");
-    console.log(user);
+    console.log("founded",user);
     // check if the user has the token to reset password
     if (user.resetPasswordToken !== token) throw new Error("No request");
     //check if token not expired
     const expiredLink = await User.findOne({
-      _id: user._id,
+      _email: user.email,
       resetPasswordExpires: { $gt: Date.now() },
     });
     console.log("checking expired link", expiredLink);
     if (!expiredLink) throw new Error("reset password expired");
     // convert new password to hashed password
     // update document and save then return response.
-    const hashedPassword = await passwordsFunctions.hashPassword(newPassword);
+    const hashedPassword = await passwordsFunctions.hashPassword(password);
     const newUser = await User.findOneAndUpdate(
       { _id: user._id },
       {
