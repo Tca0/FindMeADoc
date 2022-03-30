@@ -3,8 +3,8 @@ import userController from "../controllers/userController.js";
 import patientController from "../controllers/patientController.js";
 import doctorController from "../controllers/doctorController.js";
 import reviewController from "../controllers/reviewController.js";
-// import languageController from "../controllers/languageController.js";
-// import specialtyController from "../controllers/specialtyController.js";
+import languageController from "../controllers/languageController.js";
+import specialtyController from "../controllers/specialtyController.js";
 import { check } from "express-validator";
 import auth from "../middleware/auth.js";
 const router = express.Router();
@@ -29,6 +29,7 @@ router
     ],
     userController.register
   );
+
 router
   .route("/users/login")
   .post(
@@ -41,6 +42,7 @@ router
     ],
     userController.login
   );
+
 router.get("/users/confirm", (req, res) => {
   console.log(req.params);
   // res.status(200).send("confirm page Running");
@@ -134,9 +136,9 @@ router
   .delete(auth, reviewController.remove);
 
 // specialties
-// router.route("/specialties").get(specialtyController.findLanguages);
+router.route("/specialties").get(specialtyController.findSpecialties);
 
 // languages
-// router.route("/languages").get(languageController.findSpecialties);
+router.route("/languages").get(languageController.findLanguages);
 
 export default router;
