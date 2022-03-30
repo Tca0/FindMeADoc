@@ -1,4 +1,4 @@
-import Specialty from "../models/specialty";
+import Specialty from "../models/specialty.js";
 
 async function findSpecialties(req, res, next) {
   try {
@@ -9,4 +9,4 @@ async function findSpecialties(req, res, next) {
   }
 }
 
-export default findSpecialties;
+export default { findSpecialties };

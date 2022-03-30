@@ -1,4 +1,4 @@
-import Language from "../models/language";
+import Language from "../models/language.js";
 
 async function findLanguages(req, res, next) {
   try {
@@ -9,4 +9,4 @@ async function findLanguages(req, res, next) {
   }
 }
 
-export default findLanguages;
+export default { findLanguages };

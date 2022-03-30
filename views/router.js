@@ -134,9 +134,9 @@ router
   .delete(auth, reviewController.remove);
 
 // specialties
-router.route("/specialties").get(specialtyController.findLanguages);
+router.route("/specialties").get(specialtyController.findSpecialties);
 
 // languages
-router.route("/languages").get(languageController.findSpecialties);
+router.route("/languages").get(languageController.findLanguages);
 
 export default router;
