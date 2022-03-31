@@ -27,10 +27,10 @@ async function register(req, res, next) {
     const existedUser = await User.findOne({ email: req.body.email });
     //if user is registered but the account was deleted which means the account is unavailable more
     // then they need to re-activate their accounts again
-    console.log(existedUser)
+    console.log(existedUser);
     if (existedUser && existedUser.accountDeleted)
       throw new Error("Account deleted");
-    if (existedUser && !existedUser.active) throw new Error("not active");
+    if (existedUser && !existedUser.active) throw new Error("Not active");
     if (existedUser) throw new Error("user existed");
     if (
       !passwordsFunctions.confirmPassword(
@@ -44,7 +44,7 @@ async function register(req, res, next) {
       email: req.body.email,
       password: req.body.password,
     };
-    (req.body.role)? newUser.role= req.body.role : ""
+    req.body.role ? (newUser.role = req.body.role) : "";
     console.log(newUser);
     //hashing password
     const hashedPassword = await passwordsFunctions.hashPassword(
@@ -92,7 +92,6 @@ async function register(req, res, next) {
     next(err);
   }
 }
-
 //login process and generating a token
 async function login(req, res, next) {
   try {
@@ -103,14 +102,14 @@ async function login(req, res, next) {
     const user = await User.findOne({ email: req.body.email });
     console.log(user);
     if (!user) throw new Error("invalid login");
-    if (user.accountDeleted) throw new Error("Account deleted")
+    if (user.accountDeleted) throw new Error("Account deleted");
     if (!user.active) throw new Error("Not active");
     //it will compare the entered password with the hashed one(remember that)
     const isItMatch = await passwordsFunctions.comparePassword(
       user.password,
       req.body.password
     );
-    
+
     if (!isItMatch) throw new Error("invalid login");
     const loggedIinAt = Date.now();
     let payload = {};
@@ -121,7 +120,7 @@ async function login(req, res, next) {
       loggedIinAt,
     };
     user.loggedIinAt.push(loggedIinAt);
-    user.save()
+    user.save();
     if (user.role === "patient") {
       const patient = await Patient.findOne({ email: user.email });
       (payload.patientID = patient._id), (payload.name = patient.fullName);
@@ -132,10 +131,12 @@ async function login(req, res, next) {
     }
     //creating a variable to cary logged in user (necessary info for user)
     console.log(payload);
-    const token = jwt.sign(payload, process.env.JWT_SECRET, {expiresIn : '24h'});
-    res.status(200).json({message:"Login success",token});
+    const token = jwt.sign(payload, process.env.JWT_SECRET, {
+      expiresIn: "24h",
+    });
+    res.status(200).json({ message: "Login success", token });
   } catch (err) {
-    console.log("there is error")
+    console.log("there is error");
     next(err);
   }
 }
@@ -191,7 +192,6 @@ async function verifyAccount(req, res, next) {
       res.status(200).json({
         message: "Account activated, login please to complete your information",
       });
-      // return res.status(302).redirect(`http://localhost:3000/users/confirmed/${user._id}`);
     }
   } catch (err) {
     next(err);
@@ -297,7 +297,7 @@ async function forgotPassword(req, res, next) {
 }
 async function resetPassword(req, res, next) {
   const { password, confirmPassword } = req.body;
-  console.log(password, confirmPassword)
+  console.log(password, confirmPassword);
   const { token } = req.params;
   const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
   console.log("decoded token", decodedToken);
@@ -313,9 +313,9 @@ async function resetPassword(req, res, next) {
     );
     if (!isItMatch) throw new Error("password not confirmed");
     // find the user from the token
-    const user = await User.findOne({email: decodedToken.email});
+    const user = await User.findOne({ email: decodedToken.email });
     if (!user) throw new Error("no-authentication");
-    console.log("founded",user);
+    console.log("founded", user);
     // check if the user has the token to reset password
     if (user.resetPasswordToken !== token) throw new Error("No request");
     //check if token not expired

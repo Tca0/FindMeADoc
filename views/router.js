@@ -29,6 +29,7 @@ router
     ],
     userController.register
   );
+
 router
   .route("/users/login")
   .post(
@@ -41,6 +42,7 @@ router
     ],
     userController.login
   );
+
 router.get("/users/confirm", (req, res) => {
   console.log(req.params);
   // res.status(200).send("confirm page Running");
