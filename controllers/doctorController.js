@@ -1,4 +1,5 @@
 import Doctor from "../models/doctor.js";
+import Patient from '../models/patient.js'
 
 //ALL DOCTORS
 async function findDoctors(req, res, next) {
@@ -31,7 +32,9 @@ async function createDoctor(req, res, next) {
 async function showDoctor(req, res, next) {
   const id = req.params.doctorID;
   try {
-    const doctor = await Doctor.findById(id);
+    const doctor = await Doctor.findById(id)
+    .populate('reviews.user')
+    console.log(doctor,"doctor")
     if (!doctor) return res.json({ message: "doctor not found" });
     res.status(200).json(doctor);
   } catch (e) {
@@ -48,8 +51,12 @@ async function updateDoctor(req, res, next) {
     const updatedDoctor = await Doctor.findOne({ _id: id });
 
     if (!updatedDoctor) return res.json({ message: "Doctor not found by ID" });
-    if(req.currentUser.role==="patient") return res.json({message: "Patients cannot edit doctor profiles"})
-    if(req.currentUser.doctorID !== id) return res.json({message: `Unauthorized: You do not have permission to edit this profile`})
+    if (req.currentUser.role === "patient")
+      return res.json({ message: "Patients cannot edit doctor profiles" });
+    if (req.currentUser.doctorID !== id)
+      return res.json({
+        message: `Unauthorized: You do not have permission to edit this profile`,
+      });
 
     updatedDoctor.set(doctorUpdate);
     await updatedDoctor.save();
@@ -63,18 +70,21 @@ async function updateDoctor(req, res, next) {
 //!add auth to check if it current user is the same as the one found
 async function removeDoctor(req, res, next) {
   const id = req.params.doctorID;
-  try{
-    if(req.currentUser.role==="patient") return res.json({message: "Patients cannot remove Doctor profiles"})
-    if(req.currentUser.doctorID !== id) return res.json({message: `Unauthorized: You do not have permission to remove this profile`})
+  try {
+    if (req.currentUser.role === "patient")
+      return res.json({ message: "Patients cannot remove Doctor profiles" });
+    if (req.currentUser.doctorID !== id)
+      return res.json({
+        message: `Unauthorized: You do not have permission to remove this profile`,
+      });
     const deletedDoctor = await Doctor.findByIdAndDelete(id);
-  
+
     console.log(deletedDoctor);
-  
+
     if (!deletedDoctor) return res.json({ message: "doctor not found" });
     res.sendStatus(204);
-
-  }catch(e){
-    next(e)
+  } catch (e) {
+    next(e);
   }
 }
 
@@ -86,7 +96,7 @@ async function searchDoctors(req, res) {
     filters["address.postcode"] = new RegExp(postcode, "i");
   }
   if (speciality) {
-    filters.specialities = new RegExp(speciality, "i");
+    filters.specialties = new RegExp(speciality, "i");
   }
   if (name) {
     filters.fullName = new RegExp(name, "i");
