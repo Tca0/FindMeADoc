@@ -78,6 +78,7 @@ async function register(req, res, next) {
       const newPatient = await Patient.create({
         email: createdUser.email,
       });
+      console.log("created new patient", newPatient)
     }
     if (createdUser.role === "doctor") {
       const newDoctor = await Doctor.create({
@@ -94,13 +95,14 @@ async function register(req, res, next) {
 }
 //login process and generating a token
 async function login(req, res, next) {
+  console.log(req.body)
   try {
     //handle email format error
     const errors = validationResult(req);
     console.log(errors.errors);
     if (errors.errors.length !== 0) throw new Error(errors.errors[0].msg);
     const user = await User.findOne({ email: req.body.email });
-    console.log(user);
+    console.log("user",user);
     if (!user) throw new Error("invalid login");
     if (user.accountDeleted) throw new Error("Account deleted");
     if (!user.active) throw new Error("Not active");
@@ -119,24 +121,26 @@ async function login(req, res, next) {
       role: user.role,
       loggedIinAt,
     };
+    console.log("before adding the role info", payload)
     user.loggedIinAt.push(loggedIinAt);
     user.save();
     if (user.role === "patient") {
       const patient = await Patient.findOne({ email: user.email });
       (payload.patientID = patient._id), (payload.name = patient.fullName);
+      console.log("patient to add", patient);
     } else if (user.role === "doctor") {
       const doctor = await Doctor.findOne({ email: user.email });
       payload.doctorID = doctor._id;
       payload.name = doctor.fullName;
     }
     //creating a variable to cary logged in user (necessary info for user)
-    console.log(payload);
+    // console.log("added role info")
     const token = jwt.sign(payload, process.env.JWT_SECRET, {
       expiresIn: "24h",
     });
     res.status(200).json({ message: "Login success", token });
   } catch (err) {
-    console.log("there is error");
+    // console.log("there is error");
     next(err);
   }
 }
@@ -383,7 +387,6 @@ export default {
   register,
   verifyAccount,
   login,
-  verifyAccount,
   changePassword,
   forgotPassword,
   resetPassword,

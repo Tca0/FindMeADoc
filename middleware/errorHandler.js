@@ -1,5 +1,5 @@
 export default function errorHandler(err, req, res, next) {
-  console.log("error", err.message);
+  console.log("error", err.message, err);
   if (err.message.includes("no-authentication")) {
     return res.status(401).json({ message: "request is unauthorized" });
   }

@@ -12,7 +12,8 @@ async function create(req, res, next) {
   }
 
   const { body: newReview } = req;
-  newReview.user = req.currentUser.userId;
+  // created by a patient
+  newReview.user = req.currentUser.patientID;
   const doctorID = req.params.doctorID;
 
   try {
@@ -105,9 +106,25 @@ async function remove(req, res, next) {
     next(e);
   }
 }
+async function getAllReviews(req, res, next) {
+  const { doctorID } = req.params;
+  console.log(doctorID);
+  const doctor = await Doctor.findById(doctorID)
+    .populate({
+      path: "createdBy",
+      select: "fullName",
+      strictPopulate: false,
+    })
+
+  console.log("doctor",doctor)
+  const reviews = doctor.reviews 
+  console.log("reviews",reviews);
+
+}
 
 export default {
   create,
   update,
   remove,
+  getAllReviews,
 };

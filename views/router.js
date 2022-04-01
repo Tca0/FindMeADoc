@@ -133,7 +133,10 @@ router
       check("rate", "Has to be an integer").isInt(),
     ],
     reviewController.create
-  );
+  )
+  //auth function with token, but not necessary
+  .get(reviewController.getAllReviews);
+
 
 // add validation if
 router
