@@ -78,6 +78,7 @@ async function register(req, res, next) {
       const newPatient = await Patient.create({
         email: createdUser.email,
       });
+      console.log("created new patient", newPatient)
     }
     if (createdUser.role === "doctor") {
       const newDoctor = await Doctor.create({
@@ -94,13 +95,14 @@ async function register(req, res, next) {
 }
 //login process and generating a token
 async function login(req, res, next) {
+  console.log(req.body)
   try {
     //handle email format error
     const errors = validationResult(req);
     console.log(errors.errors);
     if (errors.errors.length !== 0) throw new Error(errors.errors[0].msg);
     const user = await User.findOne({ email: req.body.email });
-    console.log(user);
+    console.log("user",user);
     if (!user) throw new Error("invalid login");
     if (user.accountDeleted) throw new Error("Account deleted");
     if (!user.active) throw new Error("Not active");
@@ -119,24 +121,26 @@ async function login(req, res, next) {
       role: user.role,
       loggedIinAt,
     };
+    console.log("before adding the role info", payload)
     user.loggedIinAt.push(loggedIinAt);
     user.save();
     if (user.role === "patient") {
       const patient = await Patient.findOne({ email: user.email });
       (payload.patientID = patient._id), (payload.name = patient.fullName);
+      console.log("patient to add", patient);
     } else if (user.role === "doctor") {
       const doctor = await Doctor.findOne({ email: user.email });
       payload.doctorID = doctor._id;
       payload.name = doctor.fullName;
     }
     //creating a variable to cary logged in user (necessary info for user)
-    console.log(payload);
+    // console.log("added role info")
     const token = jwt.sign(payload, process.env.JWT_SECRET, {
       expiresIn: "24h",
     });
     res.status(200).json({ message: "Login success", token });
   } catch (err) {
-    console.log("there is error");
+    // console.log("there is error");
     next(err);
   }
 }
@@ -224,6 +228,7 @@ async function changePassword(req, res, next) {
     if (!passwordsFunctions.confirmPassword(newPassword, confirmPassword)) {
       throw new Error("password not confirmed");
     }
+    
     const password = await passwordsFunctions.hashPassword(newPassword);
     const newUser = await User.findOneAndUpdate(
       { email: req.currentUser.email },
@@ -234,11 +239,7 @@ async function changePassword(req, res, next) {
     console.log("new password", currentUser.password);
     await newUser.save();
     console.log("new user", newUser);
-    const isRight = await passwordsFunctions.comparePassword(
-      newUser.password,
-      oldPassword
-    );
-    console.log("is working after change", isRight);
+
     res.status(200).json({ message: "password has been changed" });
   } catch (err) {
     next(err);
@@ -342,13 +343,52 @@ async function resetPassword(req, res, next) {
     next(err);
   }
 }
+async function deleteAccount(req, res, next) {
+  const { password } = req.body;
+  const { userId } = req.params;
+  const { currentUser } = req;
+  const errors = validationResult(req);
+  try{
+    if (errors.errors.length !== 0) throw new Error(errors.errors[0].msg);
+    if (userId !== currentUser.userId) throw new Error("no-authentication");
+    const userToDelete = await User.findById(currentUser.userId);
+    console.log(
+      "this user is requesting delete account and approved by token",
+      userToDelete
+    );
+    const isItMatch = await passwordsFunctions.comparePassword(
+      userToDelete.password,
+      password
+    );
+    console.log(isItMatch)
+    if (!isItMatch) throw new Error("invalid password");
+    const deletedUser = await User.findByIdAndDelete(currentUser.userId)
+    if(currentUser.role === "patient") {
+      const patient = await Patient.findByIdAndDelete(currentUser.patientID)
+      return res
+        .status(200)
+        .json({
+          message: `Patient ${userToDelete.email} account deleted`,
+          patient,
+        });
+    } else if(currentUser.role === "doctor") {
+      const doctor = await Doctor.findByIdAndDelete(currentUser.doctorID)
+      return res.status(200).json({message: `Doctor ${userToDelete.email} account deleted`, doctor})
+    }
+    // const deletedUser = await User.deleteOne({email: currentUser.email});
+    // return res.status(200).json({ message: "account deleted", deletedUser });
+  } catch(e){
+    console.log(e.message)
+    next(e)
+  }
+}
 export default {
   getUsersList,
   register,
   verifyAccount,
   login,
-  verifyAccount,
   changePassword,
   forgotPassword,
   resetPassword,
+  deleteAccount,
 };
