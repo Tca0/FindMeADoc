@@ -37,14 +37,15 @@ export default function errorHandler(err, req, res, next) {
   if (err.name === "JsonWebTokenError") {
     return res.status(401).json({ message: "Invalid access." });
   }
-  if (err.message === "Not active") {
-    return res
-      .status(400)
-      .json({
+  if (err.message === "invalid password") {
+    return res.status(400).json({message: "access denied, password doesn't match"})
+  }
+    if (err.message === "Not active") {
+      return res.status(400).json({
         message:
           "Please verify your account to login, an email sent to you with verification code",
       });
-  }
+    }
 
   if (err.message === "email required" || err.message === "empty filed") {
     return res.status(406).json({ message: "please enter your email address" });
@@ -96,7 +97,7 @@ export default function errorHandler(err, req, res, next) {
   }
   if (err.message === "Account deleted") {
     return res
-      .status(204)
+      .status(404)
       .json({
         message:
           "Account deleted, please contact help center to reactivate your account or more details",

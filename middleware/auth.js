@@ -3,6 +3,8 @@ import User from "../models/user.js";
 
 export default async function auth(req, res, next) {
   const rawToken = req.headers.authorization;
+  console.log(req.headers);
+  console.log(req.body)
   console.log("rowToken",rawToken);
   try {
     if (JSON.stringify(rawToken) === "{}") {

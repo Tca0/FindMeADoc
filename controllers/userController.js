@@ -224,6 +224,7 @@ async function changePassword(req, res, next) {
     if (!passwordsFunctions.confirmPassword(newPassword, confirmPassword)) {
       throw new Error("password not confirmed");
     }
+    
     const password = await passwordsFunctions.hashPassword(newPassword);
     const newUser = await User.findOneAndUpdate(
       { email: req.currentUser.email },
@@ -234,11 +235,7 @@ async function changePassword(req, res, next) {
     console.log("new password", currentUser.password);
     await newUser.save();
     console.log("new user", newUser);
-    const isRight = await passwordsFunctions.comparePassword(
-      newUser.password,
-      oldPassword
-    );
-    console.log("is working after change", isRight);
+
     res.status(200).json({ message: "password has been changed" });
   } catch (err) {
     next(err);
@@ -342,6 +339,45 @@ async function resetPassword(req, res, next) {
     next(err);
   }
 }
+async function deleteAccount(req, res, next) {
+  const { password } = req.body;
+  const { userId } = req.params;
+  const { currentUser } = req;
+  const errors = validationResult(req);
+  try{
+    if (errors.errors.length !== 0) throw new Error(errors.errors[0].msg);
+    if (userId !== currentUser.userId) throw new Error("no-authentication");
+    const userToDelete = await User.findById(currentUser.userId);
+    console.log(
+      "this user is requesting delete account and approved by token",
+      userToDelete
+    );
+    const isItMatch = await passwordsFunctions.comparePassword(
+      userToDelete.password,
+      password
+    );
+    console.log(isItMatch)
+    if (!isItMatch) throw new Error("invalid password");
+    const deletedUser = await User.findByIdAndDelete(currentUser.userId)
+    if(currentUser.role === "patient") {
+      const patient = await Patient.findByIdAndDelete(currentUser.patientID)
+      return res
+        .status(200)
+        .json({
+          message: `Patient ${userToDelete.email} account deleted`,
+          patient,
+        });
+    } else if(currentUser.role === "doctor") {
+      const doctor = await Doctor.findByIdAndDelete(currentUser.doctorID)
+      return res.status(200).json({message: `Doctor ${userToDelete.email} account deleted`, doctor})
+    }
+    // const deletedUser = await User.deleteOne({email: currentUser.email});
+    // return res.status(200).json({ message: "account deleted", deletedUser });
+  } catch(e){
+    console.log(e.message)
+    next(e)
+  }
+}
 export default {
   getUsersList,
   register,
@@ -351,4 +387,5 @@ export default {
   changePassword,
   forgotPassword,
   resetPassword,
+  deleteAccount,
 };
