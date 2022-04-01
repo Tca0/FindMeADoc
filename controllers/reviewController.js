@@ -12,7 +12,10 @@ async function create(req, res, next) {
   }
 
   const { body: newReview } = req;
-  newReview.user = req.currentUser.patientId;
+  console.log(req.currentUser)
+  newReview.user = req.currentUser.patientID;
+  console.log("newReviw")
+  console.log(newReview)
   const doctorID = req.params.doctorID;
 
   try {

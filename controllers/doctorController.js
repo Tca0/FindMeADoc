@@ -1,4 +1,5 @@
 import Doctor from "../models/doctor.js";
+import Patient from '../models/patient.js'
 
 //ALL DOCTORS
 async function findDoctors(req, res, next) {
@@ -31,7 +32,9 @@ async function createDoctor(req, res, next) {
 async function showDoctor(req, res, next) {
   const id = req.params.doctorID;
   try {
-    const doctor = await Doctor.findById(id);
+    const doctor = await Doctor.findById(id)
+    .populate('reviews.user')
+    console.log(doctor,"doctor")
     if (!doctor) return res.json({ message: "doctor not found" });
     res.status(200).json(doctor);
   } catch (e) {
