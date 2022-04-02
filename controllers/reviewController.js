@@ -108,25 +108,9 @@ async function remove(req, res, next) {
     next(e);
   }
 }
-async function getAllReviews(req, res, next) {
-  const { doctorID } = req.params;
-  console.log(doctorID);
-  const doctor = await Doctor.findById(doctorID)
-    .populate({
-      path: "createdBy",
-      select: "fullName",
-      strictPopulate: false,
-    })
-
-  console.log("doctor",doctor)
-  const reviews = doctor.reviews 
-  console.log("reviews",reviews);
-
-}
 
 export default {
   create,
   update,
-  remove,
-  getAllReviews,
+  remove
 };

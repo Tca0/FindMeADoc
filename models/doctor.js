@@ -15,7 +15,7 @@ const addressSchema = new mongoose.Schema({
 const reviewSchema = new mongoose.Schema({
   rate: { type: Number },
   comment: { type: String, trim: true, maxLength: 450 },
-  createdBy: {
+  user: {
     type: mongoose.Schema.ObjectId,
     ref: "Patient",
     required: true,

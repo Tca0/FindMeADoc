@@ -135,7 +135,6 @@ router
     reviewController.create
   )
   //auth function with token, but not necessary
-  .get(reviewController.getAllReviews);
 
 
 // add validation if
