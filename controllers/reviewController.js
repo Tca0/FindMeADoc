@@ -73,9 +73,9 @@ async function update(req, res, next) {
 }
 
 async function remove(req, res, next) {
+  console.log("got hit")
   const { doctorID, reviewID } = req.params;
   console.log(doctorID, reviewID);
-  console.log(req.body);
 
   try {
     const doctor = await Doctor.findById(doctorID);
@@ -85,7 +85,7 @@ async function remove(req, res, next) {
         .status(404)
         .send({ message: `Doctor with ${doctorID} not found` });
     }
-
+    console.log(doctor)
     const review = doctor.reviews.id(reviewID);
 
     if (!review) {
@@ -94,7 +94,7 @@ async function remove(req, res, next) {
         .send({ message: `Review with ${reviewID} not found` });
     }
 
-    if (req.currentUser.userId !== review.user.toString()) {
+    if (req.currentUser.patientID !== review.user.toString()) {
       return res
         .status(401)
         .send({ message: "Unauthorized - You didn't create that comment" });
