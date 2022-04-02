@@ -68,8 +68,8 @@ router
   .route("/users/forgotPassword")
   .put(
     [
-      check("password", "password required").exists(),
-      check("password").notEmpty(),
+      check("email", "email required").exists(),
+      check("email").notEmpty(),
     ],
     userController.forgotPassword
   );
