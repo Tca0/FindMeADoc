@@ -20,7 +20,7 @@ async function sendConfirmationEmail(toAddress, code) {
       html: `<h1>Email Confirmation</h1>
         <h2>Hello</h2>
         <p>Thank you for subscribing. Please confirm your email by clicking on the following link</p>
-        <a href=http://localhost:3000/users/confirm/${code}/account> Click here</a>
+        <a href=https://findmedoc.netlify.app/users/confirm/${code}/account> Click here</a>
         </div>`,
     });
     return { err: false };
@@ -41,7 +41,7 @@ async function sendResetPasswordEmail(toAddress, code){
       html: `<h1>Reset password</h1>
         <h2>Hello</h2>
         <p>click on the link to reset your password</p>
-        <a href=http://localhost:3000/users/resetPassword/${code}> Click here</a>
+        <a href=https://findmedoc.netlify.app/users/resetPassword/${code}> Click here</a>
         </div>`,
     });
     return { err: false }
