@@ -340,6 +340,7 @@ async function resetPassword(req, res, next) {
     res.status(200).json({ message: "password has been reset, login again" });
   } catch (err) {
     next(err);
+    console.log(err)
   }
 }
 export default {
