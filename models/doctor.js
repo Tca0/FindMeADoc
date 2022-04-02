@@ -1,10 +1,10 @@
 import mongoose from "mongoose";
 const addressSchema = new mongoose.Schema({
-  addressLine1: { type: String, maxLength: 255, lowercase: true, trim: true },
-  addressLine2: { type: String, maxLength: 255, lowercase: true, trim: true },
-  town: { type: String, maxLength: 35, lowercase: true, trim: true },
-  country: { type: String, maxLength: 35, lowercase: true, trim: true },
-  postcode: { type: String, maxLength: 8, lowercase: true, trim: true },
+  addressLine1: { type: String, maxLength: 255, trim: true },
+  addressLine2: { type: String, maxLength: 255,  trim: true },
+  town: { type: String, maxLength: 35,  trim: true },
+  country: { type: String, maxLength: 35,  trim: true },
+  postcode: { type: String, maxLength: 8,  trim: true },
   enteredDate: { type: Date, default: Date.now },
   lng:{type:Number},
   lat:{type:Number },
@@ -23,9 +23,9 @@ const reviewSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
 });
 const doctorSchema = new mongoose.Schema({
-  firstName: { type: String, lowercase: true, trim: true },
-  secondName: { type: String, lowercase: true, trim: true },
-  fullName: { type: String, toLowerCase: true },
+  firstName: { type: String , trim: true },
+  secondName: { type: String , trim: true },
+  fullName: { type: String},
   email: { type: String, unique: true, lowercase: true, required: true },
   specialties: [{ type: String }],
   DOB: { type: Date,},
