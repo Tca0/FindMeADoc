@@ -317,3 +317,20 @@ Other team members have done a brilliant job - Taher has implemented the whole c
 - We were reviewing each other's code and researching for solutions to the problems when someone from the group got stuck. We also shared useful/ interesting code snippets on Slack. These methods helped all of us to grow as developers collectively and maintained a good team spirit throughout the project.
 
 - I have personally felt proud of the results achieved in the `Edit Forms` component. This was my first time working with complex nested data structures on the frontend. And I was happy to manage to achieve the result by implementing functionality from scratch rather than using code found online.
+
+## installed nodes:
+
+npm i express
+npm i express --save command
+npm i cors
+npm install mongoose
+npm install --save express-validator
+npm i validator
+npm i express-validator
+npm install jsonwebtoken
+npm i bcrypt
+npm i --save bcrypt 
+npm i dotenv
+npm install nodemailer
+npm install --save nodemailer
+npm install --save @types/nodemailer
