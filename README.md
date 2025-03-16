@@ -1,23 +1,3 @@
-# FindMeADoc1
-
-Project 3 SEI
-
-# installed nodes:
-
-npm i express
-npm i express --save command
-npm i cors
-npm install mongoose
-npm install --save express-validator
-npm i validator
-npm i express-validator
-npm install jsonwebtoken
-npm i bcrypt
-npm i --save bcrypt 
-npm i dotenv
-npm install nodemailer
-npm install --save nodemailer
-npm install --save @types/nodemailer
 
 # ![](https://ga-dash.s3.amazonaws.com/production/assets/logo-9f88ae6c9c3871690e33280fcf557f33.png) GA London SEI Project-3-findMeADoc
 
